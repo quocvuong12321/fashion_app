@@ -1,7 +1,20 @@
+import 'package:fashionshop_app/view/product_list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../provider/product_provider.dart';
+import 'provider/product_detail_provider.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ProductProvider()..fetchProducts()),
+        ChangeNotifierProvider(create: (_) => ProductDetailProvider())],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: ProductListScreen(),
+      ),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -9,12 +22,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      home: ProductListScreen(),
+      debugShowCheckedModeBanner: false,
+      
     );
   }
 }
