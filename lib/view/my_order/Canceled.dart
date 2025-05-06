@@ -1,4 +1,4 @@
-import 'package:fashionshop_app/RequestAPI/Config.dart';
+import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/model/Order.dart';
 import 'package:fashionshop_app/view/my_order/OrderItem.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +22,8 @@ class _CanceledState extends State<Canceled> {
         final order = widget.orders[index];
         return OrderItem(
           date: DateFormat('dd/MM/yyyy HH:mm:ss').format(order.create_date),
-          imageUrl:
-              '${Config.apiUrlHien}media/products?id=${order.order_detail[0].product_info.image}',
-          title: order.order_detail[0].product_info.name,
+          imageUrl: order.order_detail[index].product_info.image,
+          title: order.order_detail[index].product_info.name,
           subtitle:
               order.order_detail.length > 1
                   ? "+${order.order_detail.length - 1} order products"

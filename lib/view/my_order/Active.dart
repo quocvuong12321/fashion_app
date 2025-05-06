@@ -1,4 +1,3 @@
-import 'package:fashionshop_app/RequestAPI/Config.dart';
 import 'package:fashionshop_app/view/my_order/Order_Details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,8 +21,7 @@ class _ActiveState extends State<Active> {
         final order = widget.orders[index];
         return OrderItem(
           date: DateFormat('dd/MM/yyyy HH:mm:ss').format(order.create_date),
-          imageUrl:
-              '${Config.apiUrlHien}media/products?id=${order.order_detail[0].product_info.image}',
+          imageUrl: order.order_detail[0].product_info.image,
           title: order.order_detail[0].product_info.name,
           subtitle:
               order.order_detail.length > 1

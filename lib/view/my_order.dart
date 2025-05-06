@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import 'package:flutter/material.dart';
 import 'my_order/Active.dart';
 import 'my_order/Completed.dart';
@@ -21,15 +22,13 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   }
 
   void loadOrders() {
-    futureOrders = Request_Order.fetchOrders(
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzYXUgbsOgeSB0cnV54buBbiByb2xlIHbDoG8gxJHDonkiLCJleHAiOjE3NDcwMTAyNzAsImlhdCI6MTc0NjI5MDI3MCwiaXNzIjoiaGllbmxhemFkYS5lZHUudm4iLCJzdWIiOiIyMDI5NzA2MzA4In0.N8cgOe7WZpSOuo3bYik5tuhP1QBfAt4omZ666mQMnXQ",
-    );
+    futureOrders = Request_Order.fetchOrders(ApiService.token);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(),
+      theme: ThemeData.light(),
       home: FutureBuilder<List<Order>>(
         future: futureOrders,
         builder: (context, snapshot) {
@@ -75,7 +74,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                       Tab(text: 'Đã hủy'),
                     ],
                     labelColor: Colors.green,
-                    unselectedLabelColor: Colors.white,
+                    unselectedLabelColor: Colors.black,
                     indicatorColor: Colors.green,
                   ),
                 ),
