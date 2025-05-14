@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'my_order.dart';
+import 'product_list_screen.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -19,11 +21,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  String _selectedCategoryId = '12';
 
   // Danh sách các màn hình tương ứng với từng tab
   static final List<Widget> _screens = <Widget>[
     HomeScreen(),
-    WishlistScreen(),
+    ProductListScreen(categoryId: '12'),
     CartScreen(),
     MyOrderScreen(),
     AccountScreen(),
@@ -32,6 +35,10 @@ class _MainScreenState extends State<MainScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 1) {
+        // Nếu chọn tab "List", truyền categoryId vào ProductListScreen
+        _screens[1] = ProductListScreen(categoryId: _selectedCategoryId);
+      }
     });
   }
 
@@ -42,10 +49,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Wishlist',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'List'),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Cart',
@@ -73,15 +77,15 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class WishlistScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Wishlist')),
-      body: Center(child: Text('Your Wishlist')),
-    );
-  }
-}
+// class ProductListScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text("Danh Sách Sản Phẩm")),
+//       body: Center(child: Text("Hiển thị danh sách sản phẩm ở đây")),
+//     );
+//   }
+// }
 
 class CartScreen extends StatelessWidget {
   @override
