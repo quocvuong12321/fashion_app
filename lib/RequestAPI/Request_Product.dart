@@ -2,21 +2,39 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/Product.dart';
 import 'api_Services.dart';
+import '../model/products_respone.dart';
 
 class Request_Products {
   // URL của API để lấy danh sách sản phẩm
   static final String baseUrl = ApiService.UrlVuong + "products/";
 
   // Hàm fetch sản phẩm từ API
-  static Future<List<Product>> fetchProducts() async {
-    try {
-      final response = await http.get(Uri.parse(baseUrl));
+  // static Future<List<Product>> fetchProducts() async {
+  //   try {
+  //     final response = await http.get(Uri.parse(baseUrl));
 
-      // Kiểm tra mã trạng thái HTTP
+  //     // Kiểm tra mã trạng thái HTTP
+  //     if (response.statusCode == 200) {
+  //       // Nếu thành công, chuyển đổi dữ liệu JSON thành danh sách Product
+  //       final List data = jsonDecode(response.body);
+  //       return data.map((product) => Product.fromJson(product)).toList();
+  //     } else {
+  //       throw Exception("Failed to load products");
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching products: $e");
+  //     throw Exception("Error fetching products");
+  //   }
+  // }
+
+  static Future<ProductResponse> fetchProductsResponse({int page = 1}) async {
+    try {
+      final url = Uri.parse("$baseUrl?page=$page");
+      final response = await http.get(url);
+
       if (response.statusCode == 200) {
-        // Nếu thành công, chuyển đổi dữ liệu JSON thành danh sách Product
-        final List data = jsonDecode(response.body);
-        return data.map((product) => Product.fromJson(product)).toList();
+        final jsonData = jsonDecode(response.body);
+        return ProductResponse.fromJson(jsonData);
       } else {
         throw Exception("Failed to load products");
       }
@@ -26,27 +44,43 @@ class Request_Products {
     }
   }
 
-  // Lọc sản phẩm theo danh mục (category_id) và giá
-  static Future<List<Product>> filterProducts(
-    String categoryId,
-    double minPrice,
-    double maxPrice,
-  ) async {
-    try {
-      final url = Uri.parse(
-        "$baseUrl/$categoryId?min_price=$minPrice&max_price=$maxPrice",
-      );
-      final response = await http.get(url);
+  // // Lọc sản phẩm theo danh mục (category_id) và giá
+  // static Future<List<Product>> filterProducts(
+  //   String categoryId,
+  //   double minPrice,
+  //   double maxPrice,
+  // ) async {
+  //   try {
+  //     final url = Uri.parse(
+  //       "$baseUrl/$categoryId?min_price=$minPrice&max_price=$maxPrice",
+  //     );
+  //     final response = await http.get(url);
 
-      if (response.statusCode == 200) {
-        final List data = jsonDecode(response.body);
-        return data.map((e) => Product.fromJson(e)).toList();
-      } else {
-        throw Exception("Failed to load filtered products");
-      }
-    } catch (e) {
-      print("Error fetching filtered products: $e");
-      throw Exception("Error fetching filtered products");
+  //     if (response.statusCode == 200) {
+  //       final List data = jsonDecode(response.body);
+  //       return data.map((e) => Product.fromJson(e)).toList();
+  //     } else {
+  //       throw Exception("Failed to load filtered products");
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching filtered products: $e");
+  //     throw Exception("Error fetching filtered products");
+  //   }
+  // }
+
+  static Future<List<Product>> fetchProductsByCategory(
+    String categoryId, {
+    int page = 1,
+  }) async {
+    final url = Uri.parse("$baseUrl?category_id=$categoryId&page=$page");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final productsJson = jsonData['products'] as List;
+      return productsJson.map((e) => Product.fromJson(e)).toList();
+    } else {
+      throw Exception("Failed to load products by category");
     }
   }
 
@@ -80,34 +114,35 @@ class Request_Products {
   }
 
   // Hàm fetch sản phẩm theo categoryId
-  static Future<List<Product>> fetchProductsByCategory(String categoryId) async {
-    try {
-      final url = Uri.parse(
-        "$baseUrl/$categoryId",
-      );
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // Nếu API trả về danh sách ở data['result'] hoặc data['products'] thì sửa lại cho đúng
-        final List productsData = data is List
-            ? data
-            : (data['result'] ?? data['products'] ?? []);
-        return productsData.map((e) => Product.fromJson(e)).toList();
-      } else {
-        throw Exception("Failed to load products by category");
-      }
-    } catch (e) {
-      print("Error fetching products by category: $e");
-      throw Exception("Error fetching products by category");
-    }
-  }
+  // static Future<List<Product>> fetchProductsByCategory(
+  //   String categoryId,
+  // ) async {
+  //   try {
+  //     final url = Uri.parse("$baseUrl/$categoryId");
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       // Nếu API trả về danh sách ở data['result'] hoặc data['products'] thì sửa lại cho đúng
+  //       final List productsData =
+  //           data is List ? data : (data['result'] ?? data['products'] ?? []);
+  //       return productsData.map((e) => Product.fromJson(e)).toList();
+  //     } else {
+  //       throw Exception("Failed to load products by category");
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching products by category: $e");
+  //     throw Exception("Error fetching products by category");
+  //   }
+  // }
 
   static Future<Product> fetchProductDetail(String productId) async {
     final url = Uri.parse("${ApiService.UrlVuong}products/detail/$productId");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return Product.fromJson(data); // hoặc ProductDetail.fromJson nếu có model riêng
+      return Product.fromJson(
+        data,
+      ); // hoặc ProductDetail.fromJson nếu có model riêng
     } else {
       throw Exception("Failed to load product detail");
     }

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String UrlHien = 'http://192.168.1.12:8080/v1/';
-  static const String UrlVuong = 'http://192.168.1.12:5000/';
+  static const String UrlHien = 'http://192.168.0.108:8080/v1/';
+  static const String UrlVuong = 'http://192.168.0.108:5000/';
   static String token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzYXUgbsOgeSB0cnV54buBbiByb2xlIHbDoG8gxJHDonkiLCJleHAiOjE3NDcwMTAyNzAsImlhdCI6MTc0NjI5MDI3MCwiaXNzIjoiaGllbmxhemFkYS5lZHUudm4iLCJzdWIiOiIyMDI5NzA2MzA4In0.N8cgOe7WZpSOuo3bYik5tuhP1QBfAt4omZ666mQMnXQ';
 

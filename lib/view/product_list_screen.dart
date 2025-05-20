@@ -25,10 +25,41 @@ class _ProductListScreenState extends State<ProductListScreen> {
   String selectedCategoryName = "";
   bool isLoading = true;
   bool isFiltering = false;
+  int currentPage = 1;
+  int totalPages = 1;
   @override
   void initState() {
     super.initState();
     fetchProducts();
+  }
+
+  Widget buildPagination() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed:
+              (currentPage > 1 && !isLoading && !isFiltering)
+                  ? () {
+                    fetchProducts(page: currentPage - 1);
+                  }
+                  : null,
+          child: Text("Previous"),
+        ),
+        SizedBox(width: 16),
+        Text("Trang $currentPage / $totalPages"),
+        SizedBox(width: 16),
+        ElevatedButton(
+          onPressed:
+              (currentPage < totalPages && !isLoading && !isFiltering)
+                  ? () {
+                    fetchProducts(page: currentPage + 1);
+                  }
+                  : null,
+          child: Text("Next"),
+        ),
+      ],
+    );
   }
 
   // Hàm xử lý sắp xếp sản phẩm
@@ -59,14 +90,17 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts({int page = 1}) async {
+    setState(() {
+      isLoading = true;
+    });
     try {
-      final productList = await Request_Products.fetchProducts();
+      final response = await Request_Products.fetchProductsResponse(page: page);
       setState(() {
-        products = productList;
-        filteredProducts = List.from(
-          products,
-        ); // Ban đầu chưa lọc gì, hiển thị tất cả sản phẩm
+        products = response.products;
+        filteredProducts = List.from(products);
+        currentPage = response.currentPage;
+        totalPages = response.totalPages;
         isLoading = false;
       });
     } catch (e) {
@@ -97,7 +131,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
           fetched.addAll(categoryProducts);
         }
       } else {
-        fetched = await Request_Products.fetchProducts();
+        fetched = await Request_Products.fetchProductsResponse(
+          page: currentPage,
+        ).then((response) => response.products);
       }
 
       setState(() {
@@ -179,34 +215,43 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ),
             )
           else
-            GridView.builder(
-              padding: const EdgeInsets.only(bottom: 80),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.55,
-                crossAxisSpacing: 2,
-                mainAxisSpacing: 2,
-              ),
-              itemCount: filteredProducts.length,
-              itemBuilder: (context, index) {
-                final product = filteredProducts[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) => ProductDetailScreen(
-                              productSpuId: product.productSpuId,
+            Column(
+              children: [
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 80),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.55,
+                          crossAxisSpacing: 2,
+                          mainAxisSpacing: 2,
+                        ),
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = filteredProducts[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => ProductDetailScreen(
+                                    productSpuId: product.productSpuId,
+                                  ),
                             ),
-                      ),
-                    );
-                  },
-                  child: ProductCard(product: product),
-                );
-              },
+                          );
+                        },
+                        child: ProductCard(product: product),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 8),
+                buildPagination(),
+                SizedBox(height: 8),
+              ],
             ),
-          // Sort & Filter Button
           Positioned(
             bottom: 20,
             left: 0,
