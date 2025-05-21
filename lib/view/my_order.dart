@@ -41,21 +41,21 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                     .where(
                       (e) =>
                           e.order_status == 'Chờ Xác Nhận' ||
-                          e.order_status == 'Đã Nác Nhận',
+                          e.order_status == 'Đã Xác Nhận',
                     )
                     .toList();
-            activeOrders.sort((a, b) => b.create_date.compareTo(a.create_date));
+            activeOrders.sort((a, b) => a.create_date.compareTo(b.create_date));
             final completedOrders =
                 allOrders
                     .where((e) => e.order_status == 'Đã Giao Hàng')
                     .toList();
             completedOrders.sort(
-              (a, b) => b.create_date.compareTo(a.create_date),
+              (a, b) => a.create_date.compareTo(b.create_date),
             );
             final canceledOrders =
                 allOrders.where((e) => e.order_status == 'Đã Hủy').toList();
             canceledOrders.sort(
-              (a, b) => b.create_date.compareTo(a.create_date),
+              (a, b) => a.create_date.compareTo(b.create_date),
             );
 
             return DefaultTabController(
@@ -80,7 +80,14 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                 ),
                 body: TabBarView(
                   children: [
-                    Active(orders: activeOrders),
+                    Active(
+                      orders: activeOrders,
+                      onOrderChanged: () {
+                        setState(() {
+                          loadOrders(); // Reload đơn hàng khi có thay đổi
+                        });
+                      },
+                    ),
                     Completed(orders: completedOrders),
                     Canceled(orders: canceledOrders),
                   ],

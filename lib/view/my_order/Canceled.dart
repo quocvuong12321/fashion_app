@@ -1,4 +1,3 @@
-import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/model/Order.dart';
 import 'package:fashionshop_app/view/my_order/OrderItem.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +27,7 @@ class _CanceledState extends State<Canceled> {
               order.order_detail.length > 1
                   ? "+${order.order_detail.length - 1} order products"
                   : "",
-          total: "${order.total_amount} đ",
+          total: NumberFormat('0,000 đ').format(order.total_amount),
           onButtonPressed: () => {},
           buttonLabel: "Leave feedback",
         );

@@ -1,9 +1,10 @@
-import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import 'package:fashionshop_app/model/Customer_Address.dart';
 import 'package:fashionshop_app/model/Order.dart';
+import 'package:fashionshop_app/view/my_order/Track_Order.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../RequestAPI/Request_Order.dart';
 
 class Order_Details extends StatefulWidget {
   final Order orderSeleted;
@@ -336,10 +337,83 @@ class _Order_DetailsState extends State<Order_Details> {
                           ),
                         ),
                         SizedBox(height: 30),
+
+                        if (widget.orderStatus == 'Chờ Xác Nhận')
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                bool confirm =
+                                    await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Xác nhận hủy đơn hàng'),
+                                          content: Text(
+                                            'Bạn có chắc muốn hủy đơn hàng này không?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed:
+                                                  () => Navigator.of(
+                                                    context,
+                                                  ).pop(false),
+                                              child: Text('Không'),
+                                            ),
+                                            TextButton(
+                                              onPressed:
+                                                  () => Navigator.of(
+                                                    context,
+                                                  ).pop(true),
+                                              child: Text('Có'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ) ??
+                                    false;
+
+                                if (confirm) {
+                                  await Request_Order.cancelOrder(
+                                    widget.orderSeleted.order_id!,
+                                    ApiService.token,
+                                  );
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Đơn hàng đã được hủy.'),
+                                    ),
+                                  );
+
+                                  Navigator.pop(
+                                    context,
+                                    true,
+                                  ); // Trả kết quả về cho màn trước
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 50,
+                                  vertical: 15,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'Hủy đơn hàng',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        SizedBox(height: 30),
                       ],
                     ),
                   ),
-                  Text("aaa"),
+                  OrderStatusWidget(status: widget.orderStatus),
                 ],
               ),
             ),

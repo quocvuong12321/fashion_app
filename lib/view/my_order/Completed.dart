@@ -1,4 +1,3 @@
-import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/model/Order.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -27,7 +26,7 @@ class _CompletedState extends State<Completed> {
               order.order_detail.length > 1
                   ? "+${order.order_detail.length - 1} order products"
                   : "",
-          total: "${order.total_amount} đ",
+          total: NumberFormat('#,### đ').format(order.total_amount),
           onButtonPressed: () => {},
           buttonLabel: "Leave feedback",
         );

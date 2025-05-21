@@ -9,7 +9,7 @@ class OrderItem extends StatelessWidget {
   final String total;
   final VoidCallback onButtonPressed;
   final String buttonLabel;
-
+  final String? status;
   const OrderItem({
     required this.date,
     required this.imageUrl,
@@ -18,6 +18,7 @@ class OrderItem extends StatelessWidget {
     required this.total,
     required this.onButtonPressed,
     required this.buttonLabel,
+    this.status,
   });
 
   @override
@@ -57,6 +58,9 @@ class OrderItem extends StatelessWidget {
         SizedBox(width: 8),
         Text(date, style: TextStyle(fontSize: 12, color: Colors.grey)),
         Spacer(),
+        status != null
+            ? Text(status!, style: TextStyle(fontSize: 12, color: Colors.grey))
+            : SizedBox.shrink(),
       ],
     );
   }
