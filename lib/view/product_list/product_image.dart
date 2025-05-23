@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:fashionshop_app/RequestAPI/Request_Product.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:fashionshop_app/RequestAPI/Request_Product_Detail.dart';
 
 class ProductImage extends StatelessWidget {
   final String imagePath;
   final double width;
   final double height;
+  final BoxFit fit; 
 
   const ProductImage({
     required this.imagePath,
     required this.width,
     required this.height,
+    this.fit = BoxFit.cover,
   });
 
   // Hàm xem ảnh phóng to
@@ -48,13 +51,10 @@ class ProductImage extends StatelessWidget {
     return FutureBuilder<String>(
       future: Request_Products.getImage(imagePath), // Gọi hàm lấy URL ảnh
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            width: width,
-            height: height,
-            child: Center(child: CircularProgressIndicator()),
+        if (snapshot.hasError) {
+          print(
+            "Error loading image URL for path: $imagePath, error: ${snapshot.error}",
           );
-        } else if (snapshot.hasError) {
           return Container(
             width: width,
             height: height,
@@ -68,6 +68,7 @@ class ProductImage extends StatelessWidget {
             ),
           );
         } else if (snapshot.hasData) {
+          print("Full image URL for $imagePath: ${snapshot.data}");
           return GestureDetector(
             onTap: () {
               // Kiểm tra xem có phải là trang chi tiết hay không trước khi phóng to ảnh
@@ -84,6 +85,9 @@ class ProductImage extends StatelessWidget {
               height: height,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
+                print(
+                  "Error displaying image from URL: ${snapshot.data!}, error: $error",
+                );
                 return Container(
                   width: width,
                   height: height,
@@ -100,6 +104,7 @@ class ProductImage extends StatelessWidget {
             ),
           );
         } else {
+          print("No data for image path: $imagePath");
           return Container(
             width: width,
             height: height,

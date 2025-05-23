@@ -8,30 +8,18 @@ class Request_Products {
   // URL của API để lấy danh sách sản phẩm
   static final String baseUrl = ApiService.UrlVuong + "products/";
 
-  // Hàm fetch sản phẩm từ API
-  // static Future<List<Product>> fetchProducts() async {
-  //   try {
-  //     final response = await http.get(Uri.parse(baseUrl));
-
-  //     // Kiểm tra mã trạng thái HTTP
-  //     if (response.statusCode == 200) {
-  //       // Nếu thành công, chuyển đổi dữ liệu JSON thành danh sách Product
-  //       final List data = jsonDecode(response.body);
-  //       return data.map((product) => Product.fromJson(product)).toList();
-  //     } else {
-  //       throw Exception("Failed to load products");
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching products: $e");
-  //     throw Exception("Error fetching products");
-  //   }
-  // }
-
-  static Future<ProductResponse> fetchProductsResponse({int page = 1}) async {
+  static Future<ProductResponse> fetchProductsResponse({
+    required int page,
+    required int limit,
+  }) async {
     try {
-      final url = Uri.parse("$baseUrl?page=$page");
+      final url = Uri.parse("$baseUrl?page=$page&limit=$limit");
+      print("Requesting URL: $url");
       final response = await http.get(url);
+      // final response = await http.get(url).timeout(Duration(seconds: 10));
 
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         return ProductResponse.fromJson(jsonData);
@@ -43,30 +31,6 @@ class Request_Products {
       throw Exception("Error fetching products");
     }
   }
-
-  // // Lọc sản phẩm theo danh mục (category_id) và giá
-  // static Future<List<Product>> filterProducts(
-  //   String categoryId,
-  //   double minPrice,
-  //   double maxPrice,
-  // ) async {
-  //   try {
-  //     final url = Uri.parse(
-  //       "$baseUrl/$categoryId?min_price=$minPrice&max_price=$maxPrice",
-  //     );
-  //     final response = await http.get(url);
-
-  //     if (response.statusCode == 200) {
-  //       final List data = jsonDecode(response.body);
-  //       return data.map((e) => Product.fromJson(e)).toList();
-  //     } else {
-  //       throw Exception("Failed to load filtered products");
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching filtered products: $e");
-  //     throw Exception("Error fetching filtered products");
-  //   }
-  // }
 
   static Future<List<Product>> fetchProductsByCategory(
     String categoryId, {
@@ -110,30 +74,9 @@ class Request_Products {
   }
 
   static Future<String> getImage(String imagePath) async {
-    return '${ApiService.UrlHien}media/products?id=$imagePath';
+    final encodedPath = Uri.encodeComponent(imagePath);
+    return '${ApiService.UrlHien}media/products?id=$encodedPath';
   }
-
-  // Hàm fetch sản phẩm theo categoryId
-  // static Future<List<Product>> fetchProductsByCategory(
-  //   String categoryId,
-  // ) async {
-  //   try {
-  //     final url = Uri.parse("$baseUrl/$categoryId");
-  //     final response = await http.get(url);
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       // Nếu API trả về danh sách ở data['result'] hoặc data['products'] thì sửa lại cho đúng
-  //       final List productsData =
-  //           data is List ? data : (data['result'] ?? data['products'] ?? []);
-  //       return productsData.map((e) => Product.fromJson(e)).toList();
-  //     } else {
-  //       throw Exception("Failed to load products by category");
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching products by category: $e");
-  //     throw Exception("Error fetching products by category");
-  //   }
-  // }
 
   static Future<Product> fetchProductDetail(String productId) async {
     final url = Uri.parse("${ApiService.UrlVuong}products/detail/$productId");

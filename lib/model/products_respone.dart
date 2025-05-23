@@ -16,7 +16,7 @@ class ProductResponse {
     final productsList = productsJson.map((e) => Product.fromJson(e)).toList();
     return ProductResponse(
       products: productsList,
-      totalPages: json['total_pages'],
+      totalPages: json['total_pages'] ?? 1,
       currentPage: json['current_page'],
     );
   }

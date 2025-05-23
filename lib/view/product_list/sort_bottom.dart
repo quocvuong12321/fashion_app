@@ -8,22 +8,19 @@ class SortBottom extends StatefulWidget {
   final List<Product> products;
   final Function(List<Product>) onSort;
 
-  const SortBottom({
-    super.key,
-    required this.products,
-    required this.onSort,
-  });
+  const SortBottom({super.key, required this.products, required this.onSort});
 
-  static void show(BuildContext context, List<Product> products, Function(List<Product>) onSort) {
+  static void show(
+    BuildContext context,
+    List<Product> products,
+    Function(List<Product>) onSort,
+  ) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SortBottom(
-        products: products,
-        onSort: onSort,
-      ),
+      builder: (context) => SortBottom(products: products, onSort: onSort),
     );
   }
 
@@ -32,10 +29,7 @@ class SortBottom extends StatefulWidget {
 }
 
 class _SortBottomState extends State<SortBottom> {
-  SortOption? selectedOption = SortOption.topRated;
-
   void _handleSort(SortOption option) {
-    setState(() => selectedOption = option);
     List<Product> sortedProducts = List.from(widget.products);
 
     switch (option) {
@@ -59,12 +53,17 @@ class _SortBottomState extends State<SortBottom> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ), // bo tròn phía trên
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Thanh kéo ở trên cùng
           Container(
             width: 40,
             height: 5,
@@ -77,29 +76,20 @@ class _SortBottomState extends State<SortBottom> {
 
           Text(
             "Sắp xếp",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 8),
           const Divider(),
 
-          // Danh sách các lựa chọn sort
           ...SortOption.values.map((option) {
-            return RadioListTile<SortOption>(
-              value: option,
-              groupValue: selectedOption,
-              onChanged: (value) {
-                if (value != null) {
-                  _handleSort(value);
-                }
-              },
+            return ListTile(
               title: Text(_getOptionLabel(option)),
-              activeColor: const Color.fromARGB(255, 91, 137, 92),
-              contentPadding: EdgeInsets.zero,
+              onTap: () => _handleSort(option),
             );
-          }),
+          }).toList(),
         ],
       ),
     );
@@ -109,10 +99,10 @@ class _SortBottomState extends State<SortBottom> {
     switch (option) {
       case SortOption.topRated:
         return "Đánh giá cao nhất";
-      case SortOption.priceHighToLow:
-        return "Giá giảm dần";
       case SortOption.priceLowToHigh:
         return "Giá tăng dần";
+      case SortOption.priceHighToLow:
+        return "Giá giảm dần";
       case SortOption.nameAZ:
         return "Tên A-Z";
     }
