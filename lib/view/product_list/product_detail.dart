@@ -232,24 +232,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     options.map((option) {
                                       final isSelected =
                                           option.value == selectedValue;
-                                      final sku = productDetail!.skus
-                                          .firstWhere(
-                                            (sku) => sku.value
-                                                .split('/')
-                                                .contains(
-                                                  option.productSkuAttrId,
-                                                ),
-                                            orElse:
-                                                () => ProductSku(
-                                                  productSkuId: '',
-                                                  productSpuId: '',
-                                                  value: '',
-                                                  price: 0,
-                                                  skuStock: 0,
-                                                  sort: 0,
-                                                ),
-                                          );
-                                      final isOutOfStock = sku.skuStock == 0;
+                                      Map<String, String?> tempSelectedAttrIds =
+                                          Map.from(selectedAttrIds);
+                                      tempSelectedAttrIds[attrName] =
+                                          option.productSkuAttrId;
+
+                                      // Lọc các SKU thỏa mãn tất cả lựa chọn trong tempSelectedAttrIds (bỏ null, rỗng)
+                                      final matchedSkus =
+                                          productDetail!.skus.where((sku) {
+                                            for (var entry
+                                                in tempSelectedAttrIds
+                                                    .entries) {
+                                              final selId = entry.value;
+                                              if (selId != null &&
+                                                  selId.isNotEmpty) {
+                                                if (!sku.value
+                                                    .split('/')
+                                                    .contains(selId))
+                                                  return false;
+                                              }
+                                            }
+                                            return true;
+                                          }).toList();
+                                      final isOutOfStock = matchedSkus.every(
+                                        (sku) => sku.skuStock == 0,
+                                      );
+
+                                      // final isOutOfStock = sku.skuStock == 0;
 
                                       return RawChip(
                                         label: Text(option.value),
@@ -318,48 +327,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       );
                     }).toList(),
-                    //     child: DropdownButtonFormField<String>(
-                    //       decoration: InputDecoration(
-                    //         labelText: attrName,
-                    //         border: const OutlineInputBorder(),
-                    //         contentPadding: const EdgeInsets.symmetric(
-                    //           horizontal: 12,
-                    //           vertical: 8,
-                    //         ),
-                    //       ),
-                    //       isExpanded: true,
-                    //       value: selectedValues[attrName],
-                    //       items:
-                    //           options
-                    //               .map(
-                    //                 (e) => DropdownMenuItem(
-                    //                   value: e.value,
-                    //                   child: Text(e.value),
-                    //                 ),
-                    //               )
-                    //               .toList(),
-                    //       onChanged: (val) {
-                    //         setModalState(() {
-                    //           selectedValues[attrName] = val;
-                    //           final matched = options.firstWhere(
-                    //             (e) => e.name == attrName && e.value == val,
-                    //             orElse:
-                    //                 () => ProductSkuAttr(
-                    //                   productSkuAttrId: '',
-                    //                   name: '',
-                    //                   value: '',
-                    //                   image: '',
-                    //                   productSpuId: '',
-                    //                 ),
-                    //           );
-                    //           selectedAttrIds[attrName] =
-                    //               matched.productSkuAttrId;
-                    //           updateStockAndPrice(setModalState);
-                    //         });
-                    //       },
-                    //     ),
-                    // );
-                    // }).toList(),
                     SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -418,20 +385,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         onPressed: () {
                           if (stockAvailable == 0) {
-                            Navigator.pop(context); // Đóng bottom sheet khi hết hàng
+                            Navigator.pop(
+                              context,
+                            ); // Đóng bottom sheet khi hết hàng
                             ScaffoldMessenger.of(parentContext).showSnackBar(
                               SnackBar(
-                                content: Text("Sản phẩm đã hết hàng, vui lòng chọn sản phẩm khác"),
+                                content: Text(
+                                  "Sản phẩm đã hết hàng, vui lòng chọn sản phẩm khác",
+                                ),
                               ),
                             );
                             return;
                           }
+
+                          if (quantity <= 0) {
+                            ScaffoldMessenger.of(parentContext).showSnackBar(
+                              SnackBar(
+                                content: Text("Số lượng phải lớn hơn 0"),
+                              ),
+                            );
+                            Navigator.pop(context);
+                            return;
+                          }
+
                           // Kiểm tra đủ lựa chọn phân loại
                           bool allSelected = productDetail!.skuAttrs.every(
                             (attr) => selectedValues[attr.name] != null,
                           );
                           if (!allSelected) {
-                            Navigator.pop(context); // Đóng bottom sheet khi thiếu phân loại
+                            Navigator.pop(
+                              context,
+                            ); // Đóng bottom sheet khi thiếu phân loại
                             ScaffoldMessenger.of(parentContext).showSnackBar(
                               SnackBar(
                                 content: Text("Vui lòng chọn đủ phân loại"),
@@ -439,7 +423,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             );
                             return;
                           }
-                          Navigator.pop(context); // Đóng bottom sheet khi đặt hàng thành công
+                          Navigator.pop(
+                            context,
+                          ); // Đóng bottom sheet khi đặt hàng thành công
                           String selectedOptions = selectedValues.entries
                               .map((e) => "${e.key}: ${e.value}")
                               .join(", ");
@@ -447,8 +433,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           if (isBuyNow) {
                             print("Mua ngay $quantity x $selectedOptions");
                           } else {
-                            print("Đã thêm vào giỏ $quantity x $selectedOptions");
+                            print(
+                              "Đã thêm vào giỏ $quantity x $selectedOptions",
+                            );
                             incrementCart(quantity);
+                            ScaffoldMessenger.of(parentContext).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Đã thêm $quantity sản phẩm vào giỏ hàng thành công!',
+                                ),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
                           }
                         },
                         child: Text(
@@ -767,7 +763,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () => showVariantBottomSheet(false, context), // truyền context cha
+                  onPressed:
+                      () => showVariantBottomSheet(
+                        false,
+                        context,
+                      ), // truyền context cha
                   child: Text(
                     "Thêm giỏ hàng",
                     style: TextStyle(

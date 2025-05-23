@@ -1,3 +1,4 @@
+import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'product_list/product_card.dart';
 import 'product_list/sort_bottom.dart';
@@ -94,10 +95,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         } else {
           products.addAll(response.products);
         }
-        // Khi load mới hoặc thêm trang thì cập nhật filteredProducts theo products (chưa filter)
         filteredProducts = List.from(products);
-        // Mặc định sort theo đánh giá cao nhất
-        // filteredProducts = Request_Products.sortByRating(filteredProducts);
         totalPages = response.totalPages;
         currentPage = page + 1;
       });
@@ -202,7 +200,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MainScreen(),
+              ), // Thay HomeScreen() bằng widget trang Home của bạn
+              (route) => false,
+            );
+          },
           icon: Icon(Icons.arrow_back),
         ),
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
