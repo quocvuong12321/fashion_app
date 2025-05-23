@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import '../model/Order.dart';
-import 'package:flutter/material.dart';
 
 class Request_Order {
   Request_Order._();
@@ -46,6 +45,33 @@ class Request_Order {
       }
     } catch (e) {
       print('Error canceling order: $e');
+    }
+  }
+
+  static Future<bool> feedBack(
+    List<String> productsSpuId,
+    String comment,
+    int star,
+    String accessToken,
+  ) async {
+    try {
+      for (int i = 0; i < productsSpuId.length; i++) {
+        final response = await ApiService.post('rating/auth/create', {
+          'products_spu_id': productsSpuId[i],
+          'comment': comment,
+          'star': star,
+        }, token: accessToken);
+        if (response.statusCode == 200) {
+          print('Feedback submitted successfully');
+        } else {
+          print('Failed to submit feedback: ${response.body}');
+          return false;
+        }
+      }
+      return true;
+    } catch (e) {
+      print('Error submitting feedback: $e');
+      return false;
     }
   }
 }

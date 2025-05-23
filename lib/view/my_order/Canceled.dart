@@ -2,7 +2,6 @@ import 'package:fashionshop_app/model/Order.dart';
 import 'package:fashionshop_app/view/my_order/OrderItem.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-// import 'OrderItem.dart';
 
 class Canceled extends StatefulWidget {
   final List<Order> orders;
@@ -29,7 +28,7 @@ class _CanceledState extends State<Canceled> {
                   : "",
           total: NumberFormat('0,000 đ').format(order.total_amount),
           onButtonPressed: () => {},
-          buttonLabel: "Leave feedback",
+          buttonLabel: "Mua lại",
         );
       },
     );
