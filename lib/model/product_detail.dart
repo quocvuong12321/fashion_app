@@ -5,31 +5,28 @@ class ProductDetail {
   final List<Attr> descriptionAttrs;
   final List<SkuAttr> skuAttrs;
   final List<Sku> skus;
-  final List<Rating> ratings;
+  // final List<Rating> ratings;
 
   ProductDetail({
     required this.spu,
     required this.descriptionAttrs,
     required this.skuAttrs,
     required this.skus,
-    required this.ratings,
+    // required this.ratings,
   });
 
   factory ProductDetail.fromJson(Map<String, dynamic> json) {
     return ProductDetail(
       spu: ProductSPU.fromJson(json['spu']),
-      descriptionAttrs: (json['description_attrs'] as List)
-          .map((e) => Attr.fromJson(e))
-          .toList(),
-      skuAttrs: (json['sku_attrs'] as List)
-          .map((e) => SkuAttr.fromJson(e))
-          .toList(),
-      skus: (json['skus'] as List)
-          .map((e) => Sku.fromJson(e))
-          .toList(),
-      ratings: (json['ratings'] as List)
-          .map((e) => Rating.fromJson(e))
-          .toList(),
+      descriptionAttrs:
+          (json['description_attrs'] as List)
+              .map((e) => Attr.fromJson(e))
+              .toList(),
+      skuAttrs:
+          (json['sku_attrs'] as List).map((e) => SkuAttr.fromJson(e)).toList(),
+      skus: (json['skus'] as List).map((e) => Sku.fromJson(e)).toList(),
+      // ratings:
+      //     (json['ratings'] as List).map((e) => Rating.fromJson(e)).toList(),
     );
   }
 }
@@ -67,7 +64,9 @@ class ProductSPU {
     // Parse media: nếu là chuỗi thì decode, nếu là list thì giữ nguyên
     List<String> mediaList;
     if (json['media'] is String) {
-      mediaList = List<String>.from(jsonDecode(json['media'].toString().replaceAll("'", '"')));
+      mediaList = List<String>.from(
+        jsonDecode(json['media'].toString().replaceAll("'", '"')),
+      );
     } else {
       mediaList = List<String>.from(json['media']);
     }
@@ -153,20 +152,35 @@ class Sku {
 class Rating {
   final String name;
   final String comment;
+  final String? avatar;
   final int star;
   final String createDate;
 
   Rating({
     required this.name,
+    this.avatar,
     required this.comment,
     required this.star,
     required this.createDate,
   });
 
   factory Rating.fromJson(Map<String, dynamic> json) {
+    String? avatarUrl;
+    try {
+      if (json['user_info'] != null && 
+          json['user_info']['data'] != null && 
+          json['user_info']['data']['image'] != null &&
+          json['user_info']['data']['image']['data'] != null) {
+        avatarUrl = json['user_info']['data']['image']['data'].toString();
+      }
+    } catch (e) {
+      print('Error parsing avatar: $e');
+    }
+
     return Rating(
-      name: json['name'] ?? '',
-      comment: json['comment'] ?? '',
+      name: json['user_info']?['data']?['name'] ?? 'Anonymous',
+      comment: json['comment']?['data'] ?? '',
+      avatar: avatarUrl,
       star: json['star'] ?? 0,
       createDate: json['create_date'] ?? '',
     );

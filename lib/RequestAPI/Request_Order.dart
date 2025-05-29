@@ -28,7 +28,11 @@ class Request_Order {
     }
   }
 
-  static Future<String> getImage(String imagePath) async {
+  static String getImage(String imagePath) {
     return '${ApiService.UrlHien}media/products?id=$imagePath';
+  }
+
+  static String getImageAVT(String imagePath) {
+    return '${ApiService.UrlHien}media/avatar/$imagePath';
   }
 }

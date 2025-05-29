@@ -1,12 +1,13 @@
 import 'dart:convert';
+import 'package:fashionshop_app/model/CacModelNho.dart';
 import 'package:http/http.dart' as http;
 import '../model/Product.dart';
 import 'api_Services.dart';
 import '../model/products_respone.dart';
 
-class Request_Products {
+class Request_Payment {
   // URL của API để lấy danh sách sản phẩm
-  static final String baseUrl = ApiService.UrlVuong + "products/";
+  static final String baseUrl = ApiService.UrlHien;
 
   // Hàm fetch sản phẩm từ API
   // static Future<List<Product>> fetchProducts() async {
@@ -27,20 +28,108 @@ class Request_Products {
   //   }
   // }
 
-  static Future<ProductResponse> fetchProductsResponse({int page = 1}) async {
+  static Future<List<Payment>> fetchPaymentMethodResponse() async {
     try {
-      final url = Uri.parse("$baseUrl?page=$page");
+      final url = Uri.parse("${ApiService.UrlHien}payments/get");
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-        return ProductResponse.fromJson(jsonData);
+        final payments = jsonData['result']['payments'] as List;
+
+        return payments.map((payment) => Payment.fromJson(payment)).toList();
       } else {
-        throw Exception("Failed to load products");
+        throw Exception("Failed to load payment methods");
       }
     } catch (e) {
-      print("Error fetching products: $e");
-      throw Exception("Error fetching products");
+      print("Error fetching payment methods: $e");
+      throw Exception("Error fetching payment methods");
+    }
+  }
+
+  static Future<List<CustomerAddress>> fetchCustomerAddressResponse() async {
+    try {
+      final url = Uri.parse("${ApiService.UrlHien}user/info/get_address");
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer ${ApiService.token}'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final address = jsonData['result']['addrs'] as List;
+
+        return address
+            .map((address) => CustomerAddress.fromJson(address))
+            .toList();
+      } else {
+        throw Exception("Failed to load customer address");
+      }
+    } catch (e) {
+      print("Error fetching customer address: $e");
+      throw Exception("Error fetching customer address");
+    }
+  }
+
+  static Future<List<Discount>> fetchMaGiamGiaResponse() async {
+    try {
+      final url = Uri.parse(
+        "${ApiService.UrlHien}discount/get?limit=100&page=1",
+      );
+      final response = await http.get(
+        url,
+        // headers: {'Authorization': 'Bearer ${ApiService.token}'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final discount = jsonData['result']['discounts'] as List;
+
+        return discount.map((address) => Discount.fromJson(address)).toList();
+      } else {
+        throw Exception("Failed to load discount");
+      }
+    } catch (e) {
+      print("Error fetching discount: $e");
+      throw Exception("Error fetching discount");
+    }
+  }
+
+  static Future<Map<String, dynamic>> postOrderResponse(Map<String, Object> body) async {
+    try {
+      final url = Uri.parse("${ApiService.UrlHien}order/create");
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${ApiService.token}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        print(jsonData);
+        
+        // Kiểm tra xem có payUrl trong kết quả không
+        if (jsonData['result'] != null && jsonData['result']['payUrl'] != null) {
+          return {
+            'success': true,
+            'payUrl': jsonData['result']['payUrl'],
+            'message': 'Chuyển hướng đến trang thanh toán'
+          };
+        } else {
+          return {
+            'success': true,
+            'message': 'Đặt hàng thành công'
+          };
+        }
+      } else {
+        throw Exception("Failed to create order");
+      }
+    } catch (e) {
+      print("Error post create order: $e");
+      throw Exception("Error post create order");
     }
   }
 

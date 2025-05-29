@@ -1,5 +1,8 @@
 import 'package:fashionshop_app/model/Product_Detail.dart';
+import 'package:fashionshop_app/model/Product_In_pay.dart';
+import 'package:fashionshop_app/view/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../model/Product.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -10,6 +13,7 @@ import '../../RequestAPI/Request_Product.dart';
 import '../../RequestAPI/Request_Product_Detail.dart';
 import 'product_card.dart';
 import 'package:fashionshop_app/view/product_list/product_image.dart';
+import 'product_rating.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productSpuId;
@@ -82,6 +86,75 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     setState(() {
       cartItemCount += quantity;
     });
+  }
+
+  Future<void> clickThanhToan() async {
+    // final url = Uri.parse('https://example.com');
+    navigateToPayment(createPaymentProducts());
+    // if (!await launchUrl(url)) {
+    //   throw Exception('Could not launch $url');
+    // }
+  }
+
+  // Ví dụ từ trang giỏ hàng hoặc trang chi tiết sản phẩm
+  void navigateToPayment(List<Products_In_pay> products) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(products: products),
+      ),
+    );
+  }
+
+  // Ví dụ tạo danh sách sản phẩm để thanh toán
+  List<Products_In_pay> createPaymentProducts() {
+    return [
+      Products_In_pay(
+        productsSpuId: '10091389',
+        name: 'Bộ quần áo thể thao nam màu đen- cam',
+        image:
+            'images/thoi-trang-nam___do-the-thao___bo-quan-ao-the-thao-nam/10091389_0.jpg',
+        key: 'bo-quan-ao-the-thao-nam-mau-den-cam-10091389',
+        productSkuId: '100056',
+        amount: 2,
+        price: 150000,
+        skuString: 'Kích thước quần:XL, Kích thước áo:XL, Màu sắc:Đen',
+      ),
+      Products_In_pay(
+        productsSpuId: '10091389',
+        name: 'Bộ quần áo thể thao nam màu đen- cam',
+        image:
+            'images/thoi-trang-nam___do-the-thao___bo-quan-ao-the-thao-nam/10091389_0.jpg',
+        key: 'bo-quan-ao-the-thao-nam-mau-den-cam-10091389',
+        productSkuId: '100059',
+        amount: 3,
+        price: 150000,
+        skuString: 'Kích thước quần:XL, Kích thước áo:XL, Màu sắc:Đen',
+      ),
+      Products_In_pay(
+        productsSpuId: '1009',
+        name: 'Bộ quần áo thể thao nam màu đen- cam',
+        image:
+            'images/thoi-trang-nam___do-the-thao___bo-quan-ao-the-thao-nam/10091389_0.jpg',
+        key: 'bo-quan-ao-the-thao-nam-mau-den-cam-10091389',
+        productSkuId: '1009',
+        amount: 1,
+        price: 150000,
+        skuString: 'Kích thước quần:XL, Kích thước áo:XL, Màu sắc:Đen',
+      ),
+      Products_In_pay(
+        productsSpuId: '102291',
+        name: 'Bộ quần áo thể thao nam màu đen- cam',
+        image:
+            'images/thoi-trang-nam___do-the-thao___bo-quan-ao-the-thao-nam/10091389_0.jpg',
+        key: 'bo-quan-ao-the-thao-nam-mau-den-cam-10091389',
+        productSkuId: '102291',
+        amount: 2,
+        price: 150000,
+        skuString: 'Kích thước quần:XL, Kích thước áo:XL, Màu sắc:Đen',
+      ),
+      // Thêm các sản phẩm khác nếu cần
+    ];
   }
 
   void showVariantBottomSheet(bool isBuyNow) {
@@ -346,7 +419,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final product = productDetail!.spu;
     final mediaList = product.media;
     final descriptionAttrs = productDetail!.descriptionAttrs;
-    final ratings = productDetail!.ratings;
+    // final ratings = productDetail!.ratings;
 
     final PageController _pageController = PageController();
 
@@ -438,87 +511,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             SizedBox(height: 8),
-            Html(data: product.description),
-            Divider(),
+
             // Thông tin chi tiết
             Text(
               "Thông tin chi tiết",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            Divider(),
+            Html(data: product.description),
+            Divider(),
             ...descriptionAttrs.map(
               (e) => ListTile(title: Text(e.name), subtitle: Text(e.value)),
             ),
             Divider(),
             // Đánh giá
-            Text(
-              "Đánh giá sản phẩm",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.only(bottom: 12),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: ratings.length,
-                itemBuilder: (context, index) {
-                  final rating = ratings[index];
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 12),
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.grey[300],
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    rating.name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Row(
-                                    children: List.generate(5, (i) {
-                                      return Icon(
-                                        i < rating.star
-                                            ? Icons.star
-                                            : Icons.star_border,
-                                        color: Colors.orange,
-                                        size: 16,
-                                      );
-                                    }),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                rating.comment.isEmpty
-                                    ? "(Không có bình luận)"
-                                    : rating.comment,
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+            ProductRating(
+              productSpuId: widget.productSpuId,
+              // initialRatings: productDetail!.ratings,
             ),
           ],
         ),
@@ -556,7 +565,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () => showVariantBottomSheet(true),
+                  // onPressed: () => showVariantBottomSheet(true),
+                  onPressed: clickThanhToan,
                   child: Text(
                     "Mua ngay",
                     style: TextStyle(color: Colors.white),
