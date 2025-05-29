@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+
+import '../utils/navigation_utils.dart';
+import 'cart_screen.dart';
 import 'my_order.dart';
+import 'product_list_screen.dart';
+import 'profile/account_screen.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -19,11 +24,23 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  String _selectedCategoryId = '12';
+
+  @override
+  void initState() {
+    super.initState();
+    // Register the tab setter function
+    NavigationUtils.setMainTabSetter((index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    });
+  }
 
   // Danh sách các màn hình tương ứng với từng tab
   static final List<Widget> _screens = <Widget>[
     HomeScreen(),
-    WishlistScreen(),
+    ProductListScreen(categoryId: '12'),
     CartScreen(),
     MyOrderScreen(),
     AccountScreen(),
@@ -32,6 +49,10 @@ class _MainScreenState extends State<MainScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 1) {
+        // Nếu chọn tab "List", truyền categoryId vào ProductListScreen
+        _screens[1] = ProductListScreen(categoryId: _selectedCategoryId);
+      }
     });
   }
 
@@ -42,10 +63,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Wishlist',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'List'),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Cart',
@@ -73,26 +91,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class WishlistScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Wishlist')),
-      body: Center(child: Text('Your Wishlist')),
-    );
-  }
-}
-
-class CartScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Cart')),
-      body: Center(child: Text('Your Cart')),
-    );
-  }
-}
-
 // class MyOrderScreen extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
@@ -103,12 +101,4 @@ class CartScreen extends StatelessWidget {
 //   }
 // }
 
-class AccountScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Account')),
-      body: Center(child: Text('Account Details')),
-    );
-  }
-}
+ 
