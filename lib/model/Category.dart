@@ -4,6 +4,7 @@ class Category {
   String key;
   String path;
   String? parent;
+
   List<Category>? children;
 
   Category({
@@ -19,13 +20,14 @@ class Category {
     List<Category>? children;
     if (json['child'] != null && json['child']['data'] != null) {
       final childData = json['child']['data'] as List;
-      children = childData.map((child) {
-        // Recursively process child categories
-        if (child['child'] != null && child['child']['data'] != null) {
-          return Category.fromJson(child);
-        }
-        return Category.fromJson(child);
-      }).toList();
+      children =
+          childData.map((child) {
+            // Recursively process child categories
+            if (child['child'] != null && child['child']['data'] != null) {
+              return Category.fromJson(child);
+            }
+            return Category.fromJson(child);
+          }).toList();
     }
 
     return Category(
