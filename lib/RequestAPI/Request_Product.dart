@@ -31,6 +31,40 @@ class Request_Products {
       throw Exception("Error fetching products");
     }
   }
+  static Future<List<Product>> fetchProducts() async {
+  try {
+    print("Fetching products from URL: $baseUrl");
+    final response = await http.get(Uri.parse(baseUrl));
+    print("Products API Status Code: ${response.statusCode}");
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      print("Decoded products data: $data");
+
+      if (data.containsKey('result') && data['result'] is Map<String, dynamic>) {
+        final result = data['result'] as Map<String, dynamic>;
+        if (result.containsKey('products') && result['products'] is List) {
+          final List<dynamic> productsData = result['products'];
+
+          final List<Product> products = productsData.map<Product>((productJson) {
+            return Product.fromJson(productJson as Map<String, dynamic>);
+          }).toList();
+
+          return products;
+        } else {
+          throw Exception('Missing or invalid products list in result');
+        }
+      } else {
+        throw Exception('Missing or invalid result field in response');
+      }
+    } else {
+      throw Exception("Failed to load products. Status code: ${response.statusCode}, Response: ${response.body}");
+    }
+  } catch (e) {
+    print("Error fetching products: $e");
+    throw Exception("Error fetching products: $e");
+  }
+}
 
   static Future<List<Product>> fetchProductsByCategory(
     String categoryId, {
