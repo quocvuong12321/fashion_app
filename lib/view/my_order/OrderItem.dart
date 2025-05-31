@@ -67,7 +67,7 @@ class OrderItem extends StatelessWidget {
 
   Widget _buildProductImage() {
     return FutureBuilder<String>(
-      future: Request_Order.getImage(imageUrl), // Gọi hàm lấy URL ảnh
+      future: Request_Order.fgetImage(imageUrl), // Gọi hàm lấy URL ảnh
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator(); // Chờ khi tải ảnh

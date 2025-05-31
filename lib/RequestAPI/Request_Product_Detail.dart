@@ -6,7 +6,8 @@ import 'api_Services.dart';
 class Request_Product_Detail {
   // URL của API để lấy danh sách sản phẩm
   static final String baseUrl = ApiService.UrlVuong + "products/detail/";
-
+  static final String baseUrlRatings =
+      ApiService.UrlHien + "rating/list_rating";
   // Hàm fetch sản phẩm từ API
   static Future<ProductDetail> fetchProductDetail(String productId) async {
     try {

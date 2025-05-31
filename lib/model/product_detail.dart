@@ -175,20 +175,35 @@ class ProductSku {
 class Rating {
   final String name;
   final String comment;
+  final String? avatar;
   final int star;
   final String createDate;
 
   Rating({
     required this.name,
+    this.avatar,
     required this.comment,
     required this.star,
     required this.createDate,
   });
 
   factory Rating.fromJson(Map<String, dynamic> json) {
+    String? avatarUrl;
+    try {
+      if (json['user_info'] != null &&
+          json['user_info']['data'] != null &&
+          json['user_info']['data']['image'] != null &&
+          json['user_info']['data']['image']['data'] != null) {
+        avatarUrl = json['user_info']['data']['image']['data'].toString();
+      }
+    } catch (e) {
+      print('Error parsing avatar: $e');
+    }
+
     return Rating(
-      name: json['name'] ?? '',
-      comment: json['comment'] ?? '',
+      name: json['user_info']?['data']?['name'] ?? 'Anonymous',
+      comment: json['comment']?['data'] ?? '',
+      avatar: avatarUrl,
       star: json['star'] ?? 0,
       createDate: json['create_date'] ?? '',
     );

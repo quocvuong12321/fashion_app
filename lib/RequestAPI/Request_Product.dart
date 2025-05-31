@@ -113,6 +113,31 @@ class Request_Products {
     return '${ApiService.UrlHien}media/products?id=$encodedPath';
   }
 
+  static Future<String> getAvt(String imagePath) async {
+    return '${ApiService.UrlHien}media/products?id=$imagePath';
+  }
+  // Hàm fetch sản phẩm theo categoryId
+  // static Future<List<Product>> fetchProductsByCategory(
+  //   String categoryId,
+  // ) async {
+  //   try {
+  //     final url = Uri.parse("$baseUrl/$categoryId");
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       // Nếu API trả về danh sách ở data['result'] hoặc data['products'] thì sửa lại cho đúng
+  //       final List productsData =
+  //           data is List ? data : (data['result'] ?? data['products'] ?? []);
+  //       return productsData.map((e) => Product.fromJson(e)).toList();
+  //     } else {
+  //       throw Exception("Failed to load products by category");
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching products by category: $e");
+  //     throw Exception("Error fetching products by category");
+  //   }
+  // }
+
   static Future<Product> fetchProductDetail(String productId) async {
     final url = Uri.parse("${ApiService.UrlVuong}products/detail/$productId");
     final response = await http.get(url);
