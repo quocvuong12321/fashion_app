@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import '../model/Order.dart';
+import 'Token.dart';
 
 class Request_Order {
   Request_Order._();
 
-  static Future<List<Order>> fetchOrders(String accessToken) async {
+  static Future<List<Order>> fetchOrders() async {
     try {
+      final accessToken = await AuthStorage.getRefreshToken();
+      if (accessToken == null) throw Exception('Access token is null');
       final response = await ApiService.get(
         //Ví dụ gọi service api. do dùng baseurl mặc định nên ko cần truyền
         'order/myorder', //đứa nào gọi api của t thì gán baseurl của t là dc: baseUrl = UrlVuong
@@ -32,8 +35,10 @@ class Request_Order {
     return '${ApiService.UrlHien}media/products?id=$imagePath';
   }
 
-  static Future<void> cancelOrder(String orderId, String accessToken) async {
+  static Future<void> cancelOrder(String orderId) async {
     try {
+      final accessToken = await AuthStorage.getRefreshToken();
+      if (accessToken == null) throw Exception('Access token is null');
       final response = await ApiService.put('order/cancel_order', {
         'order_id': orderId,
       }, token: accessToken);
@@ -52,10 +57,14 @@ class Request_Order {
     List<String> productsSpuId,
     String comment,
     int star,
-    String accessToken,
   ) async {
     try {
       for (int i = 0; i < productsSpuId.length; i++) {
+        final accessToken = await AuthStorage.getRefreshToken();
+        if (accessToken == null) {
+          print('Access token is null');
+          return false;
+        }
         final response = await ApiService.post('rating/auth/create', {
           'products_spu_id': productsSpuId[i],
           'comment': comment,

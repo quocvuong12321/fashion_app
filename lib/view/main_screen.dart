@@ -123,9 +123,6 @@ import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
 //   }
 // }
 
-
-
-
 void main() {
   runApp(
     MultiProvider(
@@ -193,7 +190,10 @@ class _MainScreenState extends State<MainScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'List'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'My Order'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
@@ -212,7 +212,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Home')),
-      body: Center(child: Text('Welcome to Home Screen')),
+      body: Scaffold(body: Home_Screen()),
     );
   }
 }

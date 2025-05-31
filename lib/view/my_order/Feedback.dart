@@ -25,7 +25,6 @@ class _FeedbackFormState extends State<FeedbackForm> {
       widget.productsSpuId,
       _commentController.text,
       _star,
-      ApiService.token.toString(),
     );
 
     setState(() {
