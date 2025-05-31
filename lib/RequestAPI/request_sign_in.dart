@@ -27,21 +27,15 @@ class RequestSignIn {
     }
   }
 
-  
-
   Future<bool> signIn() async {
     isLoading = true;
     errorMessage = '';
     try {
       final baseUrl = _getBaseUrl();
-      final response = await ApiService.post(
-        'user/login',
-        {
-          'username': username.trim(),
-          'password': password.trim(),
-        },
-        baseUrl: baseUrl,
-      );
+      final response = await ApiService.post('user/login', {
+        'username': username.trim(),
+        'password': password.trim(),
+      }, baseUrl: baseUrl);
 
       final data = jsonDecode(response.body);
 
@@ -61,11 +55,12 @@ class RequestSignIn {
         String? imageUrl;
         if (user['image'] != null &&
             user['image']['valid'] == true &&
-            (user['image']['data'] != null && user['image']['data'].toString().isNotEmpty)) {
+            (user['image']['data'] != null &&
+                user['image']['data'].toString().isNotEmpty)) {
           imageUrl = user['image']['data'];
         }
 
-        // Lấy số điện thoại 
+        // Lấy số điện thoại
         String? phoneNumber;
         if (user['addrs'] != null &&
             user['addrs'] is List &&
@@ -104,12 +99,10 @@ class RequestSignIn {
 
       final baseUrl = _getBaseUrl();
 
-      // Gửi logout 
-      await ApiService.post(
-        'user/logout',
-        {'refresh_token': refresh},
-        baseUrl: baseUrl,
-      );
+      // Gửi logout
+      await ApiService.post('user/logout', {
+        'refresh_token': refresh,
+      }, baseUrl: baseUrl);
 
       await AuthStorage.clearAuthData();
 
@@ -132,11 +125,9 @@ class RequestSignIn {
 
       final baseUrl = _getBaseUrl();
 
-      final response = await ApiService.post(
-        'auth/refresh',
-        {'refreshToken': refresh},
-        baseUrl: baseUrl,
-      );
+      final response = await ApiService.post('auth/refresh', {
+        'refreshToken': refresh,
+      }, baseUrl: baseUrl);
 
       final data = jsonDecode(response.body);
       final newAccess = data['result']['accessToken'] as String;

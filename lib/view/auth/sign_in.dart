@@ -1,3 +1,4 @@
+import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'sign_up.dart';
@@ -47,7 +48,10 @@ class _SignInScreenState extends State<SignInScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
           },
         ),
       ),

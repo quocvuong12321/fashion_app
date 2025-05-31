@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:http/http.dart' as http;
 import 'Token.dart';
 
 class ApiService {
-  static const String UrlHien = 'http://172.16.7.0:8080/v1/';
-  static const String UrlVuong = 'http://172.16.7.0:5000/';
+  static const String UrlHien = 'http://172.16.0.111:8080/v1/';
+  static const String UrlVuong = 'http://172.16.0.111:5000/';
   static Future<String?> token = AuthStorage.getRefreshToken();
 
   static Map<String, String> createHeaders({String? token}) {

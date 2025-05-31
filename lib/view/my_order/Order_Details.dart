@@ -303,38 +303,6 @@ class _Order_DetailsState extends State<Order_Details> {
                             color: const Color.fromARGB(255, 245, 245, 245),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.all(15),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.discount,
-                                      color: Colors.green[700],
-                                      size: 20,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      "Khuyến mãi",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  widget.discount,
-                                  style: TextStyle(
-                                    fontSize: 25,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                         SizedBox(height: 30),
 

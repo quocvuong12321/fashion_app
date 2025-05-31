@@ -753,7 +753,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             // Đánh giá
             ProductRating(
               productSpuId: widget.productSpuId,
-              // initialRatings: productDetail!.ratings,
+              initialRatings: productDetail!.ratings,
             ),
           ],
         ),

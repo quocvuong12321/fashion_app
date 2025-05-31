@@ -37,8 +37,8 @@ class Order {
       total_amount: (json['total_amount'] ?? 0 as num).toDouble(),
       customer_address_id: json['customer_address_id'] ?? "",
       discount_id:
-          json['discount_id'] != null && json['discount_id'] is Map
-              ? json['discount_id']['data'] ?? ""
+          json['discount_code'] != null && json['discount_code'] is Map
+              ? json['discount_code']['data'] ?? ""
               : "",
       payment_status: json['payment_status'] ?? "",
       order_status: json['order_status'] ?? "",
