@@ -44,20 +44,20 @@ class _ProductRatingState extends State<ProductRating> {
       isLoadingRatings = true;
     });
 
-    // try {
-    //   //   TODO: Implement API call to fetch ratings
-    //   final result = await Request_Product_Detail.fetchRatings(
-    //     widget.productSpuId,
-    //   );
-    //   setState(() {
-    //     ratings = result;
-    //     isLoadingRatings = false;
-    //   });
-    // } catch (e) {
-    //   setState(() {
-    //     isLoadingRatings = false;
-    //   });
-    // }
+    try {
+      //   TODO: Implement API call to fetch ratings
+      final result = await Request_Product_Detail.fetchRatings(
+        widget.productSpuId,
+      );
+      setState(() {
+        ratings = result;
+        isLoadingRatings = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingRatings = false;
+      });
+    }
   }
 
   Future<void> submitRating() async {
@@ -123,66 +123,66 @@ class _ProductRatingState extends State<ProductRating> {
         ),
         if (isRatingsExpanded) ...[
           // Rating input form
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Viết đánh giá của bạn",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 12),
-                Row(
-                  children: List.generate(5, (index) {
-                    return IconButton(
-                      icon: Icon(
-                        index < _userRating ? Icons.star : Icons.star_border,
-                        color: Colors.orange,
-                        size: 32,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _userRating = index + 1;
-                        });
-                      },
-                    );
-                  }),
-                ),
-                SizedBox(height: 12),
-                TextField(
-                  controller: _ratingCommentController,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintText: "Viết nhận xét của bạn về sản phẩm...",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF28804F),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    onPressed: submitRating,
-                    child: Text(
-                      "Gửi đánh giá",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 16),
+          // Container(
+          //   padding: EdgeInsets.all(16),
+          //   decoration: BoxDecoration(
+          //     color: Colors.grey[100],
+          //     borderRadius: BorderRadius.circular(8),
+          //   ),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text(
+          //         "Viết đánh giá của bạn",
+          //         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          //       ),
+          //       SizedBox(height: 12),
+          //       Row(
+          //         children: List.generate(5, (index) {
+          //           return IconButton(
+          //             icon: Icon(
+          //               index < _userRating ? Icons.star : Icons.star_border,
+          //               color: Colors.orange,
+          //               size: 32,
+          //             ),
+          //             onPressed: () {
+          //               setState(() {
+          //                 _userRating = index + 1;
+          //               });
+          //             },
+          //           );
+          //         }),
+          //       ),
+          //       SizedBox(height: 12),
+          //       TextField(
+          //         controller: _ratingCommentController,
+          //         maxLines: 3,
+          //         decoration: InputDecoration(
+          //           hintText: "Viết nhận xét của bạn về sản phẩm...",
+          //           border: OutlineInputBorder(
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //         ),
+          //       ),
+          //       SizedBox(height: 12),
+          //       SizedBox(
+          //         width: double.infinity,
+          //         child: ElevatedButton(
+          //           style: ElevatedButton.styleFrom(
+          //             backgroundColor: Color(0xFF28804F),
+          //             padding: EdgeInsets.symmetric(vertical: 12),
+          //           ),
+          //           onPressed: submitRating,
+          //           child: Text(
+          //             "Gửi đánh giá",
+          //             style: TextStyle(color: Colors.white),
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(height: 16),
           // Ratings list
           if (isLoadingRatings)
             Center(child: CircularProgressIndicator())
