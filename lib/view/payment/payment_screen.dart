@@ -107,9 +107,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'address_id': _selectedAddress!.idAddress,
       'payment_id': _selectedPaymentMethod!.paymentMethodId,
       'num_of_products': numOfProducts,
-      'discount_id': _selectedDiscount!.discountId,
     };
-
+    if (_selectedDiscount != null) {
+      orderData['discount_id'] = _selectedDiscount!.discountId;
+    }
     try {
       final result = await Request_Payment.postOrderResponse(orderData);
 

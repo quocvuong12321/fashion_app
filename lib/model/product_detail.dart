@@ -5,14 +5,12 @@ class ProductDetail {
   final List<DescriptionAttr> descriptionAttrs;
   final List<ProductSkuAttr> skuAttrs;
   final List<ProductSku> skus;
-  final List<Rating> ratings;
 
   ProductDetail({
     required this.spu,
     required this.descriptionAttrs,
     required this.skuAttrs,
     required this.skus,
-    required this.ratings,
   });
 
   factory ProductDetail.fromJson(Map<String, dynamic> json) {
@@ -29,10 +27,6 @@ class ProductDetail {
       skus:
           (json['skus'] as List? ?? [])
               .map((e) => ProductSku.fromJson(e))
-              .toList(),
-      ratings:
-          (json['ratings'] as List? ?? [])
-              .map((e) => Rating.fromJson(e))
               .toList(),
     );
   }
