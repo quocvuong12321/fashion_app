@@ -61,58 +61,61 @@ class _FeedbackFormState extends State<FeedbackForm> {
         ),
         textAlign: TextAlign.center,
       ),
-      content: Container(
-        width: double.maxFinite,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Trải nghiệm của bạn như thế nào?",
-              style: TextStyle(fontSize: 16, color: Colors.black38),
-            ),
-            const SizedBox(height: 16),
-            RatingBar.builder(
-              initialRating: _star.toDouble(),
-              minRating: 1,
-              maxRating: 5,
-              itemCount: 5,
-              glow: true,
-              glowRadius: 2,
-              itemSize: 48,
-              allowHalfRating: false,
-              itemBuilder:
-                  (context, _) =>
-                      const Icon(Icons.star_rounded, color: Colors.amber),
-              onRatingUpdate:
-                  (rating) => setState(() => _star = rating.toInt()),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _commentController,
-              decoration: InputDecoration(
-                hintText: "Hãy chia sẽ nhận xét cho sản phẩm này của bạn nhé",
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                filled: true,
-                fillColor: Colors.grey[50],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[200]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.amber),
-                ),
-                contentPadding: const EdgeInsets.all(16),
+      content: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Trải nghiệm của bạn như thế nào?",
+                style: TextStyle(fontSize: 16, color: Colors.black38),
               ),
-              maxLines: 4,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
+              const SizedBox(height: 16),
+              RatingBar.builder(
+                initialRating: _star.toDouble(),
+                minRating: 1,
+                maxRating: 5,
+                itemCount: 5,
+                glow: true,
+                glowRadius: 2,
+                itemSize: 48,
+                allowHalfRating: false,
+                itemBuilder:
+                    (context, _) =>
+                        const Icon(Icons.star_rounded, color: Colors.amber),
+                onRatingUpdate:
+                    (rating) => setState(() => _star = rating.toInt()),
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  hintText: "Hãy chia sẻ nhận xét cho sản phẩm này của bạn nhé",
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[200]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.amber),
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+                maxLines: 4,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
         ),
       ),
       actions: [

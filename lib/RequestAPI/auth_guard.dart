@@ -84,9 +84,12 @@ class _AuthGuardState extends State<AuthGuard> {
   }
 
   void _goToSignIn() {
-    Navigator.of(
+    // context.go("")
+
+    Navigator.push(
       context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => SignInScreen()));
+      MaterialPageRoute(builder: (context) => SignInScreen()),
+    );
   }
 
   @override

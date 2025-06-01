@@ -30,6 +30,7 @@ class _ActiveState extends State<Active> {
                   ? "+${order.order_detail.length - 1} sản phẩm khác"
                   : "",
           total: NumberFormat('0,000 đ').format(order.total_amount),
+          paymentStatus: order.payment_status,
           onButtonPressed: () async {
             final result = await Navigator.push(
               context,

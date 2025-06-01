@@ -38,6 +38,8 @@ class _CompletedState extends State<Completed> {
               builder: (context) => FeedbackForm(productsSpuId: spuId),
             );
           },
+          paymentStatus: order.payment_status,
+
           buttonLabel: "Đánh giá",
         );
       },

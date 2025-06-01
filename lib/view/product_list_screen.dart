@@ -1,3 +1,4 @@
+import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'product_list/product_card.dart';
@@ -197,19 +198,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
         ),
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MainScreen(),
-              ), // Thay HomeScreen() bằng widget trang Home của bạn
-              (route) => false,
-            );
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
       ),
 
       body: Stack(
