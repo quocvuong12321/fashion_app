@@ -1,15 +1,22 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
 import 'package:fashionshop_app/view/account_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'my_order.dart';
 import 'product_list_screen.dart';
-import 'package:fashionshop_app/view/auth/sign_up.dart';
-import 'package:fashionshop_app/view/auth/sign_in.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_up.dart';
-import 'package:flutter/foundation.dart';
 import 'package:fashionshop_app/view/home_screen.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
+
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => MainScreen()),
+    GoRoute(path: '/order', builder: (context, state) => MyOrderScreen()),
+    // Thêm các route khác nếu cần
+  ],
+);
 
 void main() {
   runApp(
@@ -26,20 +33,14 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Shop App Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MainScreen(),
-      routes: {
-        '/signin': (context) => SignInScreen(),
-        '/signup': (context) => SignUpScreen(),
-        '/home': (context) => HomeScreen(),
-        '/main_screen': (context) => MainScreen(),
-      },
+      routerConfig: _router,
     );
   }
 }

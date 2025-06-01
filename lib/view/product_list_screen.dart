@@ -1,3 +1,4 @@
+import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'product_list/product_card.dart';

@@ -20,7 +20,7 @@ void main() {
         Provider<RequestSignIn>(create: (_) => RequestSignIn()),
         Provider<RequestSignUp>(create: (_) => RequestSignUp()),
       ],
-      child: MyApp(),
+      child: Text(""),
     ),
   );
 }
@@ -56,24 +56,24 @@ void main() {
 //   }
 // }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shop App Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: SignInScreen(),
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Shop App Demo',
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         visualDensity: VisualDensity.adaptivePlatformDensity,
+//       ),
+//       home: SignInScreen(),
 
-      routes: {
-        '/signin': (context) => SignInScreen(),
-        '/signup': (context) => SignUpScreen(),
-        // '/home': (context) => HomeScreen(),
-        '/main_screen': (context) => MainScreen(),
-      },
-    );
-  }
-}
+//       routes: {
+//         '/signin': (context) => SignInScreen(),
+//         '/signup': (context) => SignUpScreen(),
+//         // '/home': (context) => HomeScreen(),
+//         '/main_screen': (context) => MainScreen(),
+//       },
+//     );
+//   }
+// }

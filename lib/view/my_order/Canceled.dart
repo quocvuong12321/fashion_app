@@ -29,6 +29,7 @@ class _CanceledState extends State<Canceled> {
           total: NumberFormat('0,000 đ').format(order.total_amount),
           onButtonPressed: () => {},
           buttonLabel: "Mua lại",
+          paymentStatus: order.payment_status,
         );
       },
     );

@@ -1,3 +1,4 @@
+import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
 import 'package:fashionshop_app/model/Product_Detail.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
 import 'package:fashionshop_app/view/payment/payment_screen.dart';
@@ -85,8 +86,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void navigateToPayment(List<Products_In_pay> products) {
     Navigator.push(
       context,
+
       MaterialPageRoute(
-        builder: (context) => PaymentScreen(products: products),
+        builder:
+            (context) => AuthGuard(child: PaymentScreen(products: products)),
       ),
     );
   }

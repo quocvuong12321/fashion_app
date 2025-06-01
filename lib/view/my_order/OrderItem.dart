@@ -10,6 +10,7 @@ class OrderItem extends StatelessWidget {
   final VoidCallback onButtonPressed;
   final String buttonLabel;
   final String? status;
+  final String? paymentStatus;
   const OrderItem({
     required this.date,
     required this.imageUrl,
@@ -19,6 +20,7 @@ class OrderItem extends StatelessWidget {
     required this.onButtonPressed,
     required this.buttonLabel,
     this.status,
+    this.paymentStatus,
   });
 
   @override
@@ -116,7 +118,7 @@ class OrderItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tổng số tiền', style: TextStyle(color: Colors.grey)),
+        Text(paymentStatus ?? 'Payment Status: Pending'),
         Text(
           total,
           style: TextStyle(
