@@ -11,12 +11,16 @@ class Request_Products {
   static Future<ProductResponse> fetchProductsResponse({
     required int page,
     required int limit,
+    String? categoryId, // Thêm tham số này
   }) async {
     try {
-      final url = Uri.parse("$baseUrl?page=$page&limit=$limit");
+      String urlStr = "$baseUrl?page=$page&limit=$limit";
+      if (categoryId != null && categoryId.isNotEmpty) {
+        urlStr += "&category_id=$categoryId";
+      }
+      final url = Uri.parse(urlStr);
       print("Requesting URL: $url");
       final response = await http.get(url);
-      // final response = await http.get(url).timeout(Duration(seconds: 10));
 
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");

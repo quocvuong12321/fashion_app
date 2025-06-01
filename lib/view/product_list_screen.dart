@@ -27,20 +27,27 @@ class _ProductListScreenState extends State<ProductListScreen> {
   bool isFiltering = false;
   int currentPage = 1;
   int totalPages = 1;
-  bool isLoading = true;
-  final int limit = 100;
+  bool isLoading = false;
+  final int limit = 20;
   final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchProducts(1, limit);
 
     _scrollController.addListener(() {
+      print(
+        'pixels: ${_scrollController.position.pixels}, max: ${_scrollController.position.maxScrollExtent}',
+      );
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent - 200 &&
           !isLoading &&
-          currentPage <= totalPages) {
-        fetchProducts(page: currentPage);
+          currentPage < totalPages) {
+        final nextPage = currentPage + 1;
+        print(
+          '==> SCROLL GỌI fetchProducts với page: $nextPage, currentPage hiện tại: $currentPage',
+        );
+        fetchProducts(nextPage, limit);
       }
     });
   }
@@ -73,21 +80,17 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  Future<void> fetchProducts({int page = 1}) async {
+  Future<void> fetchProducts(int page, int limit) async {
+    if (isLoading) return;
     setState(() {
       isLoading = true;
     });
-    print(
-      'currentPage: $currentPage, totalPages: $totalPages, page param: $page',
-    );
-    if (page > totalPages) return;
     try {
-      ProductResponse response = await Request_Products.fetchProductsResponse(
+      final response = await Request_Products.fetchProductsResponse(
         page: page,
         limit: limit,
+        categoryId: widget.categoryId,
       );
-      print('API call finished, received ${response.products.length} items');
-
       setState(() {
         if (page == 1) {
           products = response.products;
@@ -96,13 +99,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
         }
         filteredProducts = List.from(products);
         totalPages = response.totalPages;
-        currentPage = page + 1;
+        currentPage = page;
       });
-    } catch (e) {
-      // Xử lý lỗi ở đây nếu cần
-      print('Error fetching products: $e');
+    } catch (e, s) {
+      print("Lỗi khi fetchProducts: $e");
+      print("Stack trace: $s");
     } finally {
-      print('fetchProducts done, setting isLoading=false');
       setState(() {
         isLoading = false;
       });
@@ -126,6 +128,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       products = [];
       currentPage = 1;
     });
+    print('Filter/Sắp xếp, reset products');
 
     try {
       List<Product> fetched = [];
@@ -221,6 +224,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               children: [
                 Expanded(
                   child: GridView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.only(bottom: 80),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
