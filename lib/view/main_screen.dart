@@ -1,5 +1,6 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
 import 'package:fashionshop_app/view/account_screen.dart';
+import 'package:fashionshop_app/view/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'my_order.dart';
@@ -7,14 +8,17 @@ import 'product_list_screen.dart';
 import 'package:fashionshop_app/view/auth/sign_up.dart';
 import 'package:fashionshop_app/view/auth/sign_in.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_up.dart';
-import 'package:flutter/foundation.dart';
 import 'package:fashionshop_app/view/home_screen.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
+import '../providers/cart_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<CartProvider>(
+          create: (_) => CartProvider(),
+        ), // Thêm dòng này
         Provider<RequestSignIn>(create: (_) => RequestSignIn()),
         Provider<RequestSignUp>(create: (_) => RequestSignUp()),
       ],
@@ -39,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignUpScreen(),
         '/home': (context) => HomeScreen(),
         '/main_screen': (context) => MainScreen(),
+        '/order': (context) => MyOrderScreen(),
       },
     );
   }
@@ -98,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Home_Screen();
+    return Scaffold(body: Home_Screen());
   }
 }
 
@@ -106,10 +111,7 @@ class HomeScreen extends StatelessWidget {
 class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Cart')),
-      body: Center(child: Text('Your Cart')),
-    );
+    return Cart_Screen();
   }
 }
 

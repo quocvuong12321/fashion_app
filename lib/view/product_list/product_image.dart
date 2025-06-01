@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fashionshop_app/RequestAPI/Request_Product.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:fashionshop_app/RequestAPI/Request_Product_Detail.dart';
 
 class ProductImage extends StatelessWidget {
   final String imagePath;
   final double width;
   final double height;
-  final BoxFit fit; 
+  final BoxFit fit;
 
   const ProductImage({
     required this.imagePath,

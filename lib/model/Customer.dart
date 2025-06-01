@@ -48,4 +48,28 @@ class Customer {
       'update_date': updateDate.toIso8601String(),
     };
   }
+
+  Customer copyWith({
+    String? customerId,
+    String? name,
+    String? email,
+    String? image,
+    DateTime? dob,
+    String? gender,
+    String? accountId,
+    DateTime? createDate,
+    DateTime? updateDate,
+  }) {
+    return Customer(
+      customerId: customerId ?? this.customerId,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      image: image ?? this.image,
+      dob: dob ?? this.dob,
+      gender: gender ?? this.gender,
+      accountId: accountId ?? this.accountId,
+      createDate: createDate ?? this.createDate,
+      updateDate: updateDate ?? this.updateDate,
+    );
+  }
 }

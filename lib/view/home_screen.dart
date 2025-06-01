@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:fashionshop_app/RequestAPI/Request_ImageSearch.dart';
+import 'package:fashionshop_app/view/product_list/result_search.dart';
 import 'package:flutter/material.dart';
 import '../model/Product.dart';
 import '../view/product_list/product_card.dart';
 import '../RequestAPI/Token.dart';
-// import '../RequestAPI/request_product.dart';
 import '../RequestAPI/Request_Product.dart';
 import 'product_list/product_detail.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Home_Screen extends StatefulWidget {
   @override
@@ -32,6 +35,15 @@ class _HomeScreenState extends State<Home_Screen> {
     'https://upcontent.vn/wp-content/uploads/2024/06/banner-shop-thoi-trang-4.jpg',
     'https://intphcm.com/data/upload/dung-luong-banner-thoi-trang.jpg',
   ];
+
+  Future<File?> pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      return File(pickedFile.path);
+    }
+    return null;
+  }
 
   @override
   void initState() {
@@ -169,7 +181,7 @@ class _HomeScreenState extends State<Home_Screen> {
         title: const Text(
           'Fashionista',
           style: TextStyle(
-            color: Colors.pink,
+            color: Colors.lightGreen,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -202,16 +214,52 @@ class _HomeScreenState extends State<Home_Screen> {
                   // Ô tìm kiếm sản phẩm
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Tìm kiếm sản phẩm...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Tìm kiếm sản phẩm...',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            onChanged: _onSearchChanged,
+                          ),
                         ),
-                      ),
-                      onChanged: _onSearchChanged,
+                        const SizedBox(width: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.lightGreen,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                            ),
+                            onPressed: () async {
+                              File? imageFile =
+                                  await pickImageFromGallery(); // hoặc pickImageFromGallery()
+                              if (imageFile != null) {
+                                // Gửi ảnh này đến API tìm kiếm ảnh
+                                final products = await RequestImageSearch()
+                                    .searchImage(imageFile.path);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            ResultSearch(products: products),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 

@@ -2,19 +2,15 @@ import 'package:fashionshop_app/model/Product_Detail.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
 import 'package:fashionshop_app/view/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
-// import '../../model/Product.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../model/Product.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import '../../RequestAPI/Request_Product.dart';
 import '../../RequestAPI/Request_Product_Detail.dart';
 import 'package:fashionshop_app/view/product_list/product_image.dart';
-import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'product_rating.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart'; // Đảm bảo import đúng
 
 class ProductDetailScreen extends StatefulWidget {
   final String productSpuId;
@@ -40,7 +36,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // Hàm parse media nếu media là chuỗi
   List<String> parseMedia(dynamic media) {
     if (media is String) {
-      return (media as String)
+      return (media)
           .replaceAll(RegExp(r"[\[\]']"), "")
           .split(',')
           .map((e) => e.trim())
@@ -134,7 +130,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     int stockAvailable = 0;
     double currentPrice = product.price;
 
-    bool isStockUpdated = false;
     String findProductSKUID() {
       final selectedIds =
           selectedAttrIds.values
@@ -398,7 +393,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                     SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -515,10 +510,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             );
                           } else {
-                            print(
-                              "Đã thêm vào giỏ $quantity x $selectedOptions",
+                            // THÊM VÀO GIỎ HÀNG TOÀN CỤC
+                            final cartProvider = Provider.of<CartProvider>(
+                              parentContext,
+                              listen: false,
                             );
-                            incrementCart(quantity);
+                            cartProvider.addItem(
+                              productSkuId: findProductSKUID(),
+                              productName: productDetail!.spu.name,
+                              image: productDetail!.spu.image,
+                              price: currentPrice,
+                              quantity: quantity,
+                              selectedAttributes: selectedOptions,
+                              // Thêm các trường khác nếu cần
+                            );
+                            setState(() {
+                              cartItemCount = cartProvider.items.length;
+                            });
                             ScaffoldMessenger.of(parentContext).showSnackBar(
                               SnackBar(
                                 content: Text(

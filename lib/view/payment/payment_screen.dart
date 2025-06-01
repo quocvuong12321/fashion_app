@@ -3,7 +3,6 @@ import 'package:fashionshop_app/RequestAPI/Request_Payment.dart';
 import 'package:fashionshop_app/model/CacModelNho.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -453,7 +452,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       _selectedDiscount = null;
                       return;
                     }
-                    if (totalAmount < value!.minOrderValue) {
+                    if (totalAmount < value.minOrderValue) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(

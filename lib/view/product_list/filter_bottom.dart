@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../../RequestAPI/Request_Category.dart';
 import '../../model/Category.dart';
 
@@ -89,10 +88,7 @@ class _FilterBottomState extends State<FilterBottom> {
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildCategorySection(),
-                        _buildPriceSection(),
-                      ],
+                      children: [_buildCategorySection(), _buildPriceSection()],
                     ),
                   ),
                 ),
@@ -180,40 +176,47 @@ class _FilterBottomState extends State<FilterBottom> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         const SizedBox(height: 8),
-        ...categories.map((category) => _buildCategoryItem(category, 0)).toList(),
+        ...categories
+            .map((category) => _buildCategoryItem(category, 0))
+            .toList(),
       ],
     );
   }
 
   Widget _buildCategoryItem(Category category, int indent) {
     final isExpanded = expandedCategories[category.categoryId] ?? false;
-    final hasChildren = category.children != null && category.children!.isNotEmpty;
-    final isSelected = selectedCategories.isNotEmpty && selectedCategories.first == category.categoryId;
+    final hasChildren =
+        category.children != null && category.children!.isNotEmpty;
+    final isSelected =
+        selectedCategories.isNotEmpty &&
+        selectedCategories.first == category.categoryId;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: hasChildren
-              ? () {
-                  setState(() {
-                    expandedCategories[category.categoryId] = !isExpanded;
-                  });
-                }
-              : () {
-                  setState(() {
-                    selectedCategories
-                      ..clear()
-                      ..add(category.categoryId);
-                  });
-                },
+          onTap:
+              hasChildren
+                  ? () {
+                    setState(() {
+                      expandedCategories[category.categoryId] = !isExpanded;
+                    });
+                  }
+                  : () {
+                    setState(() {
+                      selectedCategories
+                        ..clear()
+                        ..add(category.categoryId);
+                    });
+                  },
           child: Container(
             margin: EdgeInsets.only(left: 16.0 * indent, top: 4, bottom: 4),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color.fromARGB(255, 91, 137, 92).withOpacity(0.1)
-                  : null,
+              color:
+                  isSelected
+                      ? const Color.fromARGB(255, 91, 137, 92).withOpacity(0.1)
+                      : null,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -223,9 +226,10 @@ class _FilterBottomState extends State<FilterBottom> {
                     category.name,
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: isSelected
-                          ? const Color.fromARGB(255, 91, 137, 92)
-                          : Colors.black,
+                      color:
+                          isSelected
+                              ? const Color.fromARGB(255, 91, 137, 92)
+                              : Colors.black,
                     ),
                   ),
                 ),
@@ -267,10 +271,7 @@ class _FilterBottomState extends State<FilterBottom> {
           max: 5000000,
           divisions: 100,
           activeColor: const Color.fromARGB(255, 91, 137, 92),
-          labels: RangeLabels(
-            "${minPrice.round()}₫",
-            "${maxPrice.round()}₫",
-          ),
+          labels: RangeLabels("${minPrice.round()}₫", "${maxPrice.round()}₫"),
           onChanged: (value) {
             setState(() {
               minPrice = value.start;

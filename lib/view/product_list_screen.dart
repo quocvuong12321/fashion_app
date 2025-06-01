@@ -8,8 +8,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'product_list/product_detail.dart';
 import '/RequestAPI/Request_Product.dart';
-import '/RequestAPI/Request_Category.dart';
-import '../model/Category.dart';
 import '../RequestAPI/api_Services.dart';
 import '../model/products_respone.dart';
 

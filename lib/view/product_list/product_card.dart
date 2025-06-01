@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fashionshop_app/model/Product.dart';
 import 'package:intl/intl.dart';
-import 'package:fashionshop_app/RequestAPI/Request_Product.dart';
 import 'package:fashionshop_app/view/product_list/product_image.dart';
 
 class ProductCard extends StatelessWidget {
