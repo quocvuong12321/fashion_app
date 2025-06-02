@@ -202,12 +202,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => MainScreen(),
-              ), // Thay HomeScreen() bằng widget trang Home của bạn
-              (route) => false,
+              ), // Thay HomeScreen()
             );
           },
           icon: Icon(Icons.arrow_back),

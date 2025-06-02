@@ -30,7 +30,10 @@ class _SignInScreenState extends State<SignInScreen> {
     bool success = await requestSignIn.signIn();
 
     if (success) {
-      Navigator.pushReplacementNamed(context, '/main_screen');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
     } else {
       setState(() {
         _errorMessage = requestSignIn.errorMessage;

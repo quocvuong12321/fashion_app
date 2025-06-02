@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fashionshop_app/services/fire-base.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import 'package:fashionshop_app/RequestAPI/Token.dart';
@@ -32,9 +33,11 @@ class RequestSignIn {
     errorMessage = '';
     try {
       final baseUrl = _getBaseUrl();
+      final token_mobile = await NotificationService.getToken();
       final response = await ApiService.post('user/login', {
         'username': username.trim(),
         'password': password.trim(),
+        'token_mobile': token_mobile ?? '',
       }, baseUrl: baseUrl);
 
       final data = jsonDecode(response.body);
