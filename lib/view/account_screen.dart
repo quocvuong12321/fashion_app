@@ -101,7 +101,7 @@ class _AccountScreenState extends State<Account_Screen> {
           phoneNumber = null;
         });
         // Chuyển về màn hình đăng nhập
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SignInScreen()),
         );

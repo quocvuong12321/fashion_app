@@ -23,7 +23,7 @@
             <category android:name="android.intent.category.BROWSABLE"/>
             <data
                 android:scheme="https"
-                android:host="dabc-118-68-56-216.ngrok-free.app"
+                android:host="f6e9-118-68-56-216.ngrok-free.app"
                 android:pathPrefix="/"/>
         </intent-filter>
         </activity>

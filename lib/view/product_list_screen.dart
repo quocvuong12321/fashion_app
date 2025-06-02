@@ -201,6 +201,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
         ),
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MainScreen(),
+              ), // Thay HomeScreen()
+            );
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
       ),
 
       body: Stack(
