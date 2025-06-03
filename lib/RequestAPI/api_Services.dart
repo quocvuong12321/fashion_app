@@ -3,9 +3,8 @@ import 'package:http/http.dart' as http;
 import 'Token.dart';
 
 class ApiService {
-  static const String UrlHien =
-      'https://e9c5-113-161-44-249.ngrok-free.app/v1/';
-  static const String UrlVuong = 'https://63d5-113-161-44-249.ngrok-free.app/';
+  static const String UrlHien = 'https://8622-118-68-56-216.ngrok-free.app/v1/';
+  static const String UrlVuong = 'http://192.168.1.142:5000/';
   static Future<String?> token = AuthStorage.getRefreshToken();
 
   static Map<String, String> createHeaders({String? token}) {

@@ -100,7 +100,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
       MaterialPageRoute(
         builder:
-            (context) => AuthGuard(child: PaymentScreen(products: products)),
+            (context) => AuthGuard(
+              child: PaymentScreen(products: products, inCard: false),
+            ),
       ),
     );
   }
