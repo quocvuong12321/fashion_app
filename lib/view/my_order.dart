@@ -63,10 +63,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
               child: Scaffold(
                 appBar: AppBar(
                   title: Text('My Order'),
-                  actions: [
-                    IconButton(icon: Icon(Icons.search), onPressed: () {}),
-                    IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
-                  ],
+
                   bottom: TabBar(
                     tabs: [
                       Tab(text: 'Đã đặt'),

@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:fashionshop_app/RequestAPI/AuthStorage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:path/path.dart';
 
 import '../RequestAPI/api_Services.dart';
 import '../model/Customer.dart';
@@ -96,14 +99,29 @@ class AuthService {
 
   Future<void> updateAvatar(String imagePath) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = await AuthStorage.getRefreshToken().toString();
-      final userId = prefs.getString('user_id') ?? '';
+      // final prefs = await SharedPreferences.getInstance();
+      final accessToken = await AuthStorage.getRefreshToken();
+      // final userId = prefs.getString('user_id') ?? '';
 
-      final response = await ApiService.patch(
+      String fileName = basename(imagePath);
+
+      FormData formData = FormData.fromMap({
+        'avatar': await MultipartFile.fromFile(imagePath, filename: fileName),
+      });
+
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: ApiService.UrlHien,
+          headers: {
+            if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      final response = await dio.patch(
         'user/info/update_avatar_customer',
-        {'customer_id': userId, 'image_path': imagePath},
-        token: token,
+        data: formData,
+        options: Options(headers: {'Content-Type': 'multipart/form-data'}),
       );
 
       if (response.statusCode != 200) {
@@ -111,7 +129,7 @@ class AuthService {
       }
     } catch (e) {
       print('Error updating avatar: $e');
-      throw e;
+      rethrow;
     }
   }
 }
