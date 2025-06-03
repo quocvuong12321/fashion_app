@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'Token.dart';
 
 class ApiService {
-  static const String UrlHien = 'https://8622-118-68-56-216.ngrok-free.app/v1/';
+  static const String UrlHien = 'http://192.168.1.102:8080/v1/';
   static const String UrlVuong = 'http://192.168.1.102:5000/';
   static Future<String?> token = AuthStorage.getRefreshToken();
 

@@ -1,3 +1,5 @@
+import 'package:fashionshop_app/model/Order_Detail.dart';
+
 class Products_In_pay {
   String productsSpuId;
   String name;

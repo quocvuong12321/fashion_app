@@ -141,11 +141,3 @@ class CartScreen extends StatelessWidget {
     return AuthGuard(child: Cart_Screen());
   }
 }
-
-// AccountScreen
-// class AccountScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(body: Account_Screen());
-//   }
-// }

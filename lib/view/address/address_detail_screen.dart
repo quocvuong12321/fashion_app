@@ -28,7 +28,7 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
 
     // Initialize with existing address data or defaults
     _phoneController = TextEditingController(
-      text: widget.addressModel?.phoneNumber ?? '+84344197279',
+      text: widget.addressModel?.phoneNumber ?? '',
     );
     _fullAddress = widget.addressModel?.address ?? '';
 

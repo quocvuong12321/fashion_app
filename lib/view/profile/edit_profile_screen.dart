@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -10,11 +11,8 @@ import '../../providers/profile_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Customer user;
-  
-  const EditProfileScreen({
-    Key? key,
-    required this.user,
-  }) : super(key: key);
+
+  const EditProfileScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -83,9 +81,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error selecting image: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error selecting image: $e")));
     }
   }
 
@@ -130,7 +128,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           }
 
           // Also update the profile in ProfileProvider
-          final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+          final profileProvider = Provider.of<ProfileProvider>(
+            context,
+            listen: false,
+          );
           await profileProvider.loadUserProfile();
 
           if (mounted) {
@@ -142,15 +143,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(authProvider.errorMessage ?? "Failed to update profile")),
+              SnackBar(
+                content: Text(
+                  authProvider.errorMessage ?? "Failed to update profile",
+                ),
+              ),
             );
           }
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: $e")),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Error: $e")));
         }
       } finally {
         if (mounted) {
@@ -165,28 +170,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-        centerTitle: true,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildProfileImage(),
-                    const SizedBox(height: 24),
-                    _buildFormFields(),
-                    const SizedBox(height: 32),
-                    _buildSaveButton(),
-                  ],
+      appBar: AppBar(title: const Text("Edit Profile"), centerTitle: true),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildProfileImage(),
+                      const SizedBox(height: 24),
+                      _buildFormFields(),
+                      const SizedBox(height: 32),
+                      _buildSaveButton(),
+                    ],
+                  ),
                 ),
               ),
-            ),
     );
   }
 
@@ -198,13 +201,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           CircleAvatar(
             radius: 60,
-            backgroundImage: _imageFile != null
-                ? FileImage(_imageFile!)
-                : (image.isNotEmpty ? NetworkImage(image) as ImageProvider : null),
+            backgroundImage:
+                _imageFile != null
+                    ? FileImage(_imageFile!)
+                    : (image.isNotEmpty
+                        ? NetworkImage(Request_Order.getImageAVT(image))
+                            as ImageProvider
+                        : null),
             backgroundColor: Colors.grey.shade200,
-            child: (_imageFile == null && image.isEmpty)
-                ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                : null,
+            child:
+                (_imageFile == null && image.isEmpty)
+                    ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                    : null,
           ),
           Positioned(
             bottom: 0,
@@ -213,10 +221,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               decoration: BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 2,
-                ),
+                border: Border.all(color: Colors.white, width: 2),
               ),
               child: IconButton(
                 icon: const Icon(
@@ -300,18 +305,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }
           },
           items: const [
-            DropdownMenuItem(
-              value: "male",
-              child: Text("Nam"),
-            ),
-            DropdownMenuItem(
-              value: "female",
-              child: Text("Nữ"),
-            ),
-            DropdownMenuItem(
-              value: "other",
-              child: Text("Khác"),
-            ),
+            DropdownMenuItem(value: "male", child: Text("Nam")),
+            DropdownMenuItem(value: "female", child: Text("Nữ")),
+            DropdownMenuItem(value: "other", child: Text("Khác")),
           ],
         ),
       ),
@@ -323,16 +319,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       onPressed: _updateProfile,
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: const Text(
         "Save Changes",
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }

@@ -2,13 +2,17 @@ import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/RequestAPI/Request_Payment.dart';
 import 'package:fashionshop_app/model/CacModelNho.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
+import 'package:fashionshop_app/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PaymentScreen extends StatefulWidget {
   final List<Products_In_pay> products;
-  const PaymentScreen({Key? key, required this.products}) : super(key: key);
+  final bool inCard;
+
+  const PaymentScreen({Key? key, required this.products, required this.inCard})
+    : super(key: key);
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -22,6 +26,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   CustomerAddress? _selectedAddress;
   Discount? _selectedDiscount;
   bool _isLoading = true;
+  final CartProvider cartPro = CartProvider();
 
   @override
   void initState() {
@@ -135,6 +140,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
             context,
           ).showSnackBar(SnackBar(content: Text(result['message'])));
           Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+        if (widget.inCard) {
+          cartPro.loadCartFromStorage();
+          for (var element in widget.products) {
+            cartPro.removeItem(element.productsSpuId);
+          }
         }
       }
     } catch (e) {

@@ -1,5 +1,4 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
-import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/services/fire-base.dart';
 import 'package:fashionshop_app/view/cart_screen.dart';
 import 'package:fashionshop_app/view/profile/account_screen.dart';

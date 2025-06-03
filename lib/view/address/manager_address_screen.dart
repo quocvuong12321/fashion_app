@@ -46,9 +46,7 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
   void _addNewAddress() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddressDetailsScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddressDetailsScreen()),
     );
 
     if (result != null && result is Map<String, String>) {
@@ -74,9 +72,9 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
           _isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $_error')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $_error')));
       }
     }
   }
@@ -85,9 +83,7 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddressDetailsScreen(
-          addressModel: address,
-        ),
+        builder: (context) => AddressDetailsScreen(addressModel: address),
       ),
     );
 
@@ -102,8 +98,9 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
         );
 
         setState(() {
-          final index = _addresses
-              .indexWhere((a) => a.idAddress == updatedAddress.idAddress);
+          final index = _addresses.indexWhere(
+            (a) => a.idAddress == updatedAddress.idAddress,
+          );
           if (index != -1) {
             _addresses[index] = updatedAddress;
           }
@@ -119,9 +116,9 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
           _isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $_error')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $_error')));
       }
     }
   }
@@ -157,20 +154,26 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Address'),
-        content: const Text('Are you sure you want to delete this address?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('CANCEL'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Delete Address'),
+            content: const Text(
+              'Are you sure you want to delete this address?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  'DELETE',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('DELETE', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -195,9 +198,9 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
           _isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $_error')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $_error')));
       }
     }
   }
@@ -215,67 +218,64 @@ class _ManagerAddressScreenState extends State<ManagerAddressScreen> {
         centerTitle: true,
         title: const Text('Manage Addresses'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _addNewAddress,
-          ),
+          IconButton(icon: const Icon(Icons.add), onPressed: _addNewAddress),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: _loadAddresses,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
+        child:
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
                 ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _loadAddresses,
-                          child: const Text('Try Again'),
-                        ),
-                      ],
-                    ),
-                  )
-                : _addresses.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'No saved locations yet',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _addNewAddress,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                              ),
-                              child: const Text('Add New Address'),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _addresses.length,
-                        itemBuilder: (context, index) {
-                          final address = _addresses[index];
-                          return AddressCard(
-                            addressModel: address,
-                            onChangeAddress: () => _editAddress(address),
-                            onMoreOptions: () => _showMoreOptions(address),
-                          );
-                        },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadAddresses,
+                        child: const Text('Try Again'),
+                      ),
+                    ],
+                  ),
+                )
+                : _addresses.isEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'No saved locations yet',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _addNewAddress,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        child: const Text('Add New Address'),
+                      ),
+                    ],
+                  ),
+                )
+                : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _addresses.length,
+                  itemBuilder: (context, index) {
+                    final address = _addresses[index];
+                    return AddressCard(
+                      addressModel: address,
+                      onChangeAddress: () => _editAddress(address),
+                      onMoreOptions: () => _showMoreOptions(address),
+                    );
+                  },
+                ),
       ),
     );
   }
@@ -328,37 +328,21 @@ class AddressCard extends StatelessWidget {
                     ),
                     // icon share
                     const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      onPressed: () {
-                        // Implement share functionality here
-                      },
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
                   addressModel.address,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey[700],
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.phone,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
+                    const Icon(Icons.phone, size: 16, color: Colors.grey),
                     const SizedBox(width: 4),
                     Text(
                       addressModel.phoneNumber,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -385,16 +369,6 @@ class AddressCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: onMoreOptions,
-                  ),
-                ),
               ],
             ),
           ),

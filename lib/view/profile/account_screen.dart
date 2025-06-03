@@ -1,5 +1,5 @@
+import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/view/my_order.dart';
-import 'package:fashionshop_app/view/product_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
@@ -143,7 +143,9 @@ class _AccountScreenState extends State<AccountScreen> {
             CircleAvatar(
               radius: 40,
               backgroundImage:
-                  user.image.isNotEmpty ? NetworkImage(user.image) : null,
+                  user.image.isNotEmpty
+                      ? NetworkImage(Request_Order.getImageAVT(user.image))
+                      : null,
               backgroundColor: Colors.grey.shade200,
               child:
                   user.image.isEmpty
@@ -214,17 +216,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             ),
             const Divider(height: 1),
-            _buildMenuItem(
-              Icons.favorite,
-              "My Wishlist",
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) => ProductListScreen(categoryId: 'wishlist'),
-                ),
-              ),
-            ),
+
             _buildMenuItem(Icons.settings, "Change Password", () {
               Navigator.push(
                 context,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fashionshop_app/RequestAPI/Request_Order.dart';
 import 'package:fashionshop_app/RequestAPI/Request_Search.dart';
 import 'package:fashionshop_app/view/product_list/image_search.dart';
 import 'package:fashionshop_app/view/product_list/result_search.dart';
@@ -130,23 +131,6 @@ class _HomeScreenState extends State<Home_Screen> {
     }
   }
 
-  // Hàm xử lý khi nhập vào ô tìm kiếm
-  void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-      _filteredProducts =
-          _searchQuery.isEmpty
-              ? _products
-              : _products
-                  .where(
-                    (p) => p.name.toLowerCase().contains(
-                      _searchQuery.toLowerCase(),
-                    ),
-                  )
-                  .toList();
-    });
-  }
-
   void _onSemanticSearch() async {
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
@@ -237,7 +221,11 @@ class _HomeScreenState extends State<Home_Screen> {
                 child: Row(
                   children: [
                     if (imageUrl != null && imageUrl.isNotEmpty)
-                      CircleAvatar(backgroundImage: NetworkImage(imageUrl))
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          Request_Order.getImageAVT(imageUrl),
+                        ),
+                      )
                     else
                       const Icon(Icons.account_circle, size: 30),
                     const SizedBox(width: 8),

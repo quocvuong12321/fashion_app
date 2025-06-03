@@ -1,5 +1,7 @@
-import 'package:fashionshop_app/main.dart';
+import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/model/Product_In_pay.dart';
 import 'package:fashionshop_app/providers/cart_provider.dart';
+import 'package:fashionshop_app/view/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -176,7 +178,7 @@ class Cart_Screen extends StatelessWidget {
                 Row(
                   spacing: 10,
                   children: [
-                    Text("Qty:"),
+                    Text("SL:"),
                     Text(
                       '${item.quantity}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
@@ -552,6 +554,37 @@ class Cart_Screen extends StatelessWidget {
 
   void _navigateToCheckout(BuildContext context) {
     // Navigate to checkout screen
+    // load dataa
+    List<Products_In_pay> productPay = [];
+    final cartProvider =
+        Provider.of<CartProvider>(context, listen: false).items;
+
+    for (var element in cartProvider) {
+      if (element.isSelected) {
+        productPay.add(
+          Products_In_pay(
+            productsSpuId: element.id,
+            name: element.productName,
+            image: element.image,
+            productSkuId: element.productSkuId,
+            amount: element.quantity,
+            price: element.price,
+            key: element.id + element.productSkuId,
+            skuString: element.selectedAttributes,
+          ),
+        );
+      }
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => AuthGuard(
+              child: PaymentScreen(products: productPay, inCard: true),
+            ),
+      ),
+    );
   }
 
   void _removeItem(BuildContext context, String id) {
