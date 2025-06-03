@@ -3,6 +3,8 @@ import 'package:fashionshop_app/RequestAPI/Token.dart';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class UpdateProfileScreen extends StatefulWidget {
   @override
   _UpdateProfileScreenState createState() => _UpdateProfileScreenState();
@@ -32,26 +34,76 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     });
   }
 
+  // Future<void> updateProfile() async {
+  //   if (!_formKey.currentState!.validate()) return;
+  //   _formKey.currentState!.save();
+
+  //   setState(() => isLoading = true);
+
+  //   final baseUrl = ApiService.UrlHien;
+
+  //   try {
+  //     final response = await ApiService.put('user/update-profile', {
+  //       'name': name,
+  //       'email': email,
+  //       'gender': gender,
+  //       'dob': dob,
+  //       'image': imageUrl, // gửi ảnh lên server
+  //       'phone': phoneNumber, // gửi số điện thoại lên server
+  //     }, baseUrl: baseUrl);
+
+  //     final data = jsonDecode(response.body);
+  //     if (data['success'] == true) {
+  //       await AuthStorage.saveUserInfo(
+  //         name: name ?? '',
+  //         email: email ?? '',
+  //         gender: gender ?? '',
+  //         dob: dob ?? '',
+  //         imageUrl: imageUrl,
+  //         phoneNumber: phoneNumber,
+  //       );
+  //       ScaffoldMessenger.of(
+  //         context,
+  //       ).showSnackBar(SnackBar(content: Text("Cập nhật thành công")));
+  //       Navigator.pop(context);
+  //     } else {
+  //       throw Exception(data['message']);
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text('Cập nhật thất bại: $e')));
+  //   }
+
+  //   setState(() => isLoading = false);
+  // }
   Future<void> updateProfile() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
     setState(() => isLoading = true);
 
-    final baseUrl = ApiService.UrlHien;
-
     try {
-      final response = await ApiService.put('user/update-profile', {
-        'name': name,
-        'email': email,
-        'gender': gender,
-        'dob': dob,
-        'image': imageUrl, // gửi ảnh lên server
-        'phone': phoneNumber, // gửi số điện thoại lên server
-      }, baseUrl: baseUrl);
+      final prefs = await SharedPreferences.getInstance();
+      final token =
+          prefs.getString('access_token') ?? ''; // Đúng key đã đồng bộ
+      if (token.isEmpty) throw Exception('Token is empty');
+
+      final response = await ApiService.patch(
+        'user/info/update_customer', // Đúng endpoint backend
+        {
+          'name': name,
+          'email': email,
+          'gender': gender,
+          'dob': dob,
+          'image': imageUrl,
+          'phone': phoneNumber,
+        },
+        token: token, // Truyền token vào
+      );
 
       final data = jsonDecode(response.body);
-      if (data['success'] == true) {
+      if (response.statusCode == 200 && data['success'] == true) {
         await AuthStorage.saveUserInfo(
           name: name ?? '',
           email: email ?? '',
@@ -65,7 +117,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         ).showSnackBar(SnackBar(content: Text("Cập nhật thành công")));
         Navigator.pop(context);
       } else {
-        throw Exception(data['message']);
+        throw Exception(data['message'] ?? 'Cập nhật thất bại');
       }
     } catch (e) {
       ScaffoldMessenger.of(

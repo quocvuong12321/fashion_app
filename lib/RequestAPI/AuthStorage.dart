@@ -25,7 +25,8 @@ class AuthStorage {
   /// Lấy access token
   static Future<String?> getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_accessTokenKey);
+    //return prefs.getString(_accessTokenKey);
+    return prefs.getString('access_token');
   }
 
   /// Lấy refresh token

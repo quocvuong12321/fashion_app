@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/Customer.dart';
 import '../model/Customer_Address.dart';
@@ -11,22 +12,23 @@ class ProfileService {
 
   Future<Customer?> getUserProfile() async {
     try {
-      //       final prefs = await SharedPreferences.getInstance();
-      //       final token = prefs.getString('token') ?? '';
-      //       final userId = prefs.getString('user_id') ?? '';
       //
-      //       if (userId.isEmpty || token.isEmpty) {
-      //         return null;
-      //       }
-      //
-      //       final response = await ApiService.get(
-      //         '/user/info/get_customer/$userId',
-      //         token: token,
-      //       );
-      //
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final userId = prefs.getString('user_id') ?? '';
+
+      if (userId.isEmpty || token.isEmpty) {
+        return null;
+      }
+
+      final response = await ApiService.get(
+        'user/info/get_customer/$userId',
+        token: token,
+      );
+
       final storedUsername = await AuthStorage.getUsername();
       final userInfo = await AuthStorage.getUserInfo();
-
+      //
       //       if (response.statusCode == 200) {
       //         final jsonResponse = jsonDecode(response.body);
       return Customer(
@@ -54,6 +56,40 @@ class ProfileService {
       return null;
     }
   }
+
+  // Method to update user profile
+  // Future<bool> updateUserProfile({
+  //   required String name,
+  //   required String email,
+  //   required String gender,
+  //   required String dob,
+  //   String? image,
+  // }) async {
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token') ?? '';
+  //     if (token.isEmpty) return false;
+
+  //     final body = {'name': name, 'email': email, 'gender': gender, 'dob': dob};
+  //     if (image != null) body['image'] = image;
+
+  //     final response = await ApiService.patch(
+  //       'user/info/update_customer',
+  //       body,
+  //       token: token,
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       return true;
+  //     } else {
+  //       print('Update profile failed: ${response.body}');
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     print('Error updating profile: $e');
+  //     return false;
+  //   }
+  // }
 
   // Method to get all addresses for the current user
   Future<List<Customer_Address>> getUserAddresses() async {

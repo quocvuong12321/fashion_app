@@ -14,7 +14,7 @@ class AddressService {
       if (accessToken == null) throw Exception('Access token is null');
 
       final response = await ApiService.get(
-        '/user/info/get_address',
+        'user/info/get_address',
         token: accessToken,
       );
 
@@ -45,12 +45,13 @@ class AddressService {
       print(
         'Adding address for user ID: ${address} with phone number: ${formattedPhoneNumber}',
       );
-
+      //getAccessToken
       final accessToken = await AuthStorage.getRefreshToken();
+      //final accessToken = await AuthStorage.getAccessToken();
       if (accessToken == null) throw Exception('Access token is null');
 
       final response = await ApiService.post(
-        '/user/info/create_customeraddress',
+        'user/info/create_customeraddress',
         {'address': address, 'phoneNumber': formattedPhoneNumber},
         token: accessToken,
       );
@@ -102,7 +103,7 @@ class AddressService {
       );
 
       final response =
-          await ApiService.put('/user/info/update_customeraddress', {
+          await ApiService.patch('user/info/update_customeraddress', {
             'address_id': addressId,
             'address': address,
             'phoneNumber': formattedPhoneNumber,
@@ -136,7 +137,7 @@ class AddressService {
       if (accessToken == null) throw Exception('Access token is null');
 
       final response = await ApiService.delete(
-        '/user/info/delete_customeraddress/$addressId',
+        'user/info/delete_customeraddress/$addressId',
         token: accessToken,
       );
       return response.statusCode == 200 || response.statusCode == 204;

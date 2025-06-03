@@ -1,7 +1,9 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/providers/auth_provider.dart';
+import 'package:fashionshop_app/providers/profile_provider.dart';
 import 'package:fashionshop_app/services/fire-base.dart';
-import 'package:fashionshop_app/view/account_screen.dart';
 import 'package:fashionshop_app/view/cart_screen.dart';
+import 'package:fashionshop_app/view/profile/account_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +36,10 @@ void main() async {
         ), // Thêm dòng này
         Provider<RequestSignIn>(create: (_) => RequestSignIn()),
         Provider<RequestSignUp>(create: (_) => RequestSignUp()),
+        ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
+        ChangeNotifierProvider<ProfileProvider>(
+          create: (_) => ProfileProvider(),
+        ),
       ],
       child: MyApp(),
     ),
@@ -84,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
     ProductListScreen(categoryId: '12'),
     CartScreen(),
     AuthGuard(child: MyOrderScreen()),
-    AccountScreen(),
+    AuthGuard(child: AccountScreen()),
   ];
 
   void _onItemTapped(int index) {
@@ -137,9 +143,9 @@ class CartScreen extends StatelessWidget {
 }
 
 // AccountScreen
-class AccountScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Account_Screen());
-  }
-}
+// class AccountScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(body: Account_Screen());
+//   }
+// }

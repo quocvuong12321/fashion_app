@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fashionshop_app/RequestAPI/AuthStorage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../RequestAPI/api_Services.dart';
@@ -15,13 +16,10 @@ class AuthResponse {
 class AuthService {
   Future<AuthResponse?> login(String email, String password) async {
     try {
-      final response = await ApiService.post(
-        '/user/account/login',
-        {
-          'email': email,
-          'password': password,
-        },
-      );
+      final response = await ApiService.post('/user/account/login', {
+        'email': email,
+        'password': password,
+      });
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -30,10 +28,12 @@ class AuthService {
 
         // Save token and user info in SharedPreferences
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
+        await prefs.setString('access token', token);
         await prefs.setString('user_id', user.customerId);
         await prefs.setString(
-            'user_data', jsonEncode(jsonResponse['result']['customer']));
+          'user_data',
+          jsonEncode(jsonResponse['result']['customer']),
+        );
 
         return AuthResponse(user: user, token: token);
       } else {
@@ -73,18 +73,14 @@ class AuthService {
   Future<void> updateUserInfo(Customer user) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      print("token = $token");
-      final response = await ApiService.put(
-        '/user/info/update_customer',
-        {
-          'name': user.name,
-          'dob': user.dob.toIso8601String(),
-          'email': user.email,
-          'gender': user.gender,
-        },
-        token: token,
-      );
+      final accessToken = await AuthStorage.getRefreshToken();
+      print("token = $accessToken");
+      final response = await ApiService.patch('user/info/update_customer', {
+        'name': user.name,
+        'dob': user.dob.toIso8601String(),
+        'email': user.email,
+        'gender': user.gender,
+      }, token: accessToken);
 
       if (response.statusCode == 200) {
         // Update the stored user data
@@ -102,17 +98,12 @@ class AuthService {
   Future<void> updateAvatar(String imagePath) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+      final token = await AuthStorage.getRefreshToken().toString();
       final userId = prefs.getString('user_id') ?? '';
 
-      // TODO: Implement image upload functionality
-      // This would typically involve multipart/form-data
-      final response = await ApiService.post(
-        '/user/info/update_avatar',
-        {
-          'customer_id': userId,
-          'image_path': imagePath,
-        },
+      final response = await ApiService.patch(
+        'user/info/update_avatar_customer',
+        {'customer_id': userId, 'image_path': imagePath},
         token: token,
       );
 

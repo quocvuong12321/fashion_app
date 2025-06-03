@@ -3,9 +3,8 @@ import 'package:http/http.dart' as http;
 import 'Token.dart';
 
 class ApiService {
-  static const String UrlHien =
-      'https://e9c5-113-161-44-249.ngrok-free.app/v1/';
-  static const String UrlVuong = 'https://2d97-113-161-44-249.ngrok-free.app/';
+  static const String UrlHien = 'https://8622-118-68-56-216.ngrok-free.app/v1/';
+  static const String UrlVuong = 'http://192.168.1.102:5000/';
   static Future<String?> token = AuthStorage.getRefreshToken();
 
   static Map<String, String> createHeaders({String? token}) {
@@ -54,6 +53,23 @@ class ApiService {
     String? token,
   }) async {
     final response = await http.put(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: createHeaders(token: token),
+      body: jsonEncode(body),
+    );
+    _handleErrors(response);
+    return response;
+  }
+
+  // PATCH
+
+  static Future<http.Response> patch(
+    String endpoint,
+    Map<String, dynamic> body, {
+    String baseUrl = UrlHien,
+    String? token,
+  }) async {
+    final response = await http.patch(
       Uri.parse('$baseUrl$endpoint'),
       headers: createHeaders(token: token),
       body: jsonEncode(body),
