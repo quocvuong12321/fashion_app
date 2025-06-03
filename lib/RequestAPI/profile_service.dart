@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../RequestAPI/api_Services.dart';
 import '../model/Customer.dart';
 import '../model/Customer_Address.dart';
 import 'Address_Service.dart';
@@ -13,24 +11,24 @@ class ProfileService {
 
   Future<Customer?> getUserProfile() async {
     try {
-//       final prefs = await SharedPreferences.getInstance();
-//       final token = prefs.getString('token') ?? '';
-//       final userId = prefs.getString('user_id') ?? '';
-//
-//       if (userId.isEmpty || token.isEmpty) {
-//         return null;
-//       }
-//
-//       final response = await ApiService.get(
-//         '/user/info/get_customer/$userId',
-//         token: token,
-//       );
-//
+      //       final prefs = await SharedPreferences.getInstance();
+      //       final token = prefs.getString('token') ?? '';
+      //       final userId = prefs.getString('user_id') ?? '';
+      //
+      //       if (userId.isEmpty || token.isEmpty) {
+      //         return null;
+      //       }
+      //
+      //       final response = await ApiService.get(
+      //         '/user/info/get_customer/$userId',
+      //         token: token,
+      //       );
+      //
       final storedUsername = await AuthStorage.getUsername();
       final userInfo = await AuthStorage.getUserInfo();
 
-//       if (response.statusCode == 200) {
-//         final jsonResponse = jsonDecode(response.body);
+      //       if (response.statusCode == 200) {
+      //         final jsonResponse = jsonDecode(response.body);
       return Customer(
         customerId: "",
         name: userInfo['name'] ?? "",
@@ -42,9 +40,9 @@ class ProfileService {
         createDate: DateTime.now(),
         updateDate: DateTime.now(),
       );
-//       } else {
-//         throw Exception('Failed to get user profile: ${response.statusCode}');
-//       }
+      //       } else {
+      //         throw Exception('Failed to get user profile: ${response.statusCode}');
+      //       }
     } catch (e) {
       print('Error getting user profile: $e');
       // Try to get from shared preferences as fallback
@@ -64,13 +62,18 @@ class ProfileService {
 
   // Method to add a new address
   Future<Customer_Address> addAddress(
-      String address, String phoneNumber) async {
+    String address,
+    String phoneNumber,
+  ) async {
     return await _addressService.addAddress(address, phoneNumber);
   }
 
   // Method to update an address
   Future<Customer_Address> updateAddress(
-      String addressId, String address, String phoneNumber) async {
+    String addressId,
+    String address,
+    String phoneNumber,
+  ) async {
     return await _addressService.updateAddress(addressId, address, phoneNumber);
   }
 

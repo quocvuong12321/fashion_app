@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:fashionshop_app/RequestAPI/Request_ImageSearch.dart';
-import 'package:fashionshop_app/view/product_list/result_search.dart';
+import 'package:fashionshop_app/view/product_list/image_search.dart';
 import 'package:flutter/material.dart';
 import '../model/Product.dart';
 import '../view/product_list/product_card.dart';
@@ -19,6 +18,7 @@ class _HomeScreenState extends State<Home_Screen> {
   List<Product> _products = [];
   List<Product> _filteredProducts = [];
   bool _loading = true;
+  bool _loadingImageSearch = false;
 
   Map<String, String?>? _userInfo; // Thông tin người dùng từ Token
   late TextEditingController _searchController; // Controller cho ô tìm kiếm
@@ -43,6 +43,16 @@ class _HomeScreenState extends State<Home_Screen> {
       return File(pickedFile.path);
     }
     return null;
+  }
+
+  // Hàm truyền callback bật/tắt loading vào showPickImageDialog
+  void _showPickImageDialogWithLoading() {
+    showPickImageDialog(
+      context,
+      onLoading: (isLoading) {
+        if (mounted) setState(() => _loadingImageSearch = isLoading);
+      },
+    );
   }
 
   @override
@@ -176,149 +186,145 @@ class _HomeScreenState extends State<Home_Screen> {
     final imageUrl = _userInfo?['image'];
     final name = _userInfo?['name'] ?? 'User';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Fashionista',
-          style: TextStyle(
-            color: Colors.lightGreen,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Row(
-              children: [
-                // Ảnh đại diện người dùng
-                if (imageUrl != null && imageUrl.isNotEmpty)
-                  CircleAvatar(backgroundImage: NetworkImage(imageUrl))
-                else
-                  const Icon(Icons.account_circle, size: 30),
-                const SizedBox(width: 8),
-                Text(name, style: const TextStyle(fontSize: 16)),
-              ],
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Fashionista',
+              style: TextStyle(
+                color: Colors.lightGreen,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Row(
+                  children: [
+                    // Ảnh đại diện người dùng
+                    if (imageUrl != null && imageUrl.isNotEmpty)
+                      CircleAvatar(backgroundImage: NetworkImage(imageUrl))
+                    else
+                      const Icon(Icons.account_circle, size: 30),
+                    const SizedBox(width: 8),
+                    Text(name, style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
 
-      body:
-          _loading
-              ? const Center(
-                child: CircularProgressIndicator(),
-              ) // Hiển thị loading khi đang tải
-              : Column(
-                children: [
-                  // Ô tìm kiếm sản phẩm
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: 'Tìm kiếm sản phẩm...',
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
+          body:
+              _loading
+                  ? const Center(
+                    child: CircularProgressIndicator(),
+                  ) // Hiển thị loading khi đang tải
+                  : Column(
+                    children: [
+                      // Ô tìm kiếm sản phẩm
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Tìm kiếm sản phẩm...',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onChanged: _onSearchChanged,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.lightGreen,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                            ),
-                            onChanged: _onSearchChanged,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.lightGreen,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                            ),
-                            onPressed: () async {
-                              File? imageFile =
-                                  await pickImageFromGallery(); // hoặc pickImageFromGallery()
-                              if (imageFile != null) {
-                                // Gửi ảnh này đến API tìm kiếm ảnh
-                                final products = await RequestImageSearch()
-                                    .searchImage(imageFile.path);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) =>
-                                            ResultSearch(products: products),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Banner quảng cáo dạng slider tự động
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    height: 150,
-                    width: double.infinity,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: PageView(
-                        controller: _pageController,
-                        children:
-                            _bannerImages
-                                .map(
-                                  (url) =>
-                                      Image.network(url, fit: BoxFit.cover),
-                                )
-                                .toList(),
-                      ),
-                    ),
-                  ),
-
-                  // Tiêu đề phần sản phẩm nổi bật
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8,
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: ShaderMask(
-                        shaderCallback:
-                            (bounds) => const LinearGradient(
-                              colors: [Colors.pinkAccent, Colors.orangeAccent],
-                            ).createShader(bounds),
-                        child: const Text(
-                          '🌟 Sản phẩm nổi bật',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(1.5, 1.5),
-                                blurRadius: 3,
-                                color: Colors.black26,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                ),
+                                onPressed: _showPickImageDialogWithLoading,
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Banner quảng cáo dạng slider tự động
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        height: 150,
+                        width: double.infinity,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: PageView(
+                            controller: _pageController,
+                            children:
+                                _bannerImages
+                                    .map(
+                                      (url) =>
+                                          Image.network(url, fit: BoxFit.cover),
+                                    )
+                                    .toList(),
                           ),
                         ),
                       ),
-                    ),
-                  ),
 
-                  // Danh sách sản phẩm
-                  Expanded(child: _buildProductGrid()),
-                ],
-              ),
+                      // Tiêu đề phần sản phẩm nổi bật
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: ShaderMask(
+                            shaderCallback:
+                                (bounds) => const LinearGradient(
+                                  colors: [
+                                    Colors.pinkAccent,
+                                    Colors.orangeAccent,
+                                  ],
+                                ).createShader(bounds),
+                            child: const Text(
+                              '🌟 Sản phẩm nổi bật',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(1.5, 1.5),
+                                    blurRadius: 3,
+                                    color: Colors.black26,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Danh sách sản phẩm
+                      Expanded(child: _buildProductGrid()),
+                    ],
+                  ),
+        ),
+        if (_loadingImageSearch)
+          Container(
+            color: Colors.black45,
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+      ],
     );
   }
 }

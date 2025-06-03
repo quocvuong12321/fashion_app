@@ -25,7 +25,8 @@ class RequestImageSearch {
         List<dynamic> productList = data['products'];
         return productList.map((item) => Product.fromJson(item)).toList();
       } else {
-        throw Exception('Failed to load products: ${response.statusCode}');
+        return [];
+        // throw Exception('Failed to load products: ${response.statusCode}');
       }
     } catch (e) {
       print('Error in searchImage: $e');

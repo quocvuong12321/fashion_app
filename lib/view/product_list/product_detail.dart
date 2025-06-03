@@ -51,18 +51,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> fetchProduct() async {
     try {
+      print('Fetching product detail for ID: ${widget.productSpuId}');
       final result = await Request_Product_Detail.fetchProductDetail(
         widget.productSpuId,
       );
+      print('Product detail fetched successfully: ${result != null}');
 
-      setState(() {
-        productDetail = result;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          productDetail = result;
+          isLoading = false;
+        });
+      }
+    } catch (e, stackTrace) {
+      print('Error fetching product detail: $e');
+      print('Stack trace: $stackTrace');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Có lỗi xảy ra khi tải thông tin sản phẩm'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
