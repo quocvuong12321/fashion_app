@@ -35,6 +35,9 @@ class NotificationService {
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+
+    // subcribe default topic
+    await subscribeToTopic("discoumt_info");
   }
 
   Future<void> subscribeToTopic(String topic) async {
