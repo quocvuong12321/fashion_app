@@ -9,6 +9,7 @@ import '../RequestAPI/Token.dart';
 import '../RequestAPI/Request_Product.dart';
 import 'product_list/product_detail.dart';
 import 'package:image_picker/image_picker.dart';
+import 'account_screen.dart';
 
 class Home_Screen extends StatefulWidget {
   @override
@@ -189,16 +190,24 @@ class _HomeScreenState extends State<Home_Screen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: Row(
-              children: [
-                // Ảnh đại diện người dùng
-                if (imageUrl != null && imageUrl.isNotEmpty)
-                  CircleAvatar(backgroundImage: NetworkImage(imageUrl))
-                else
-                  const Icon(Icons.account_circle, size: 30),
-                const SizedBox(width: 8),
-                Text(name, style: const TextStyle(fontSize: 16)),
-              ],
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Account_Screen()),
+                );
+              },
+              child: Row(
+                children: [
+                  // Ảnh đại diện người dùng
+                  if (imageUrl != null && imageUrl.isNotEmpty)
+                    CircleAvatar(backgroundImage: NetworkImage(imageUrl))
+                  else
+                    const Icon(Icons.account_circle, size: 30),
+                  const SizedBox(width: 8),
+                  Text(name, style: const TextStyle(fontSize: 16)),
+                ],
+              ),
             ),
           ),
         ],
