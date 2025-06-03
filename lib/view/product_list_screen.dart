@@ -1,4 +1,3 @@
-import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'product_list/product_card.dart';
@@ -10,7 +9,6 @@ import 'dart:convert';
 import 'product_list/product_detail.dart';
 import '/RequestAPI/Request_Product.dart';
 import '../RequestAPI/api_Services.dart';
-import '../model/products_respone.dart';
 
 class ProductListScreen extends StatefulWidget {
   final String categoryId;

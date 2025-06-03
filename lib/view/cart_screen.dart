@@ -1,3 +1,4 @@
+import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

@@ -1,79 +1,145 @@
-import 'dart:async';
-
-import 'package:fashionshop_app/view/main_screen.dart';
-import 'package:fashionshop_app/view/product_list_screen.dart';
+import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/services/fire-base.dart';
+import 'package:fashionshop_app/view/account_screen.dart';
+import 'package:fashionshop_app/view/cart_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:fashionshop_app/view/main_screen.dart';
-import 'package:fashionshop_app/view/auth/sign_in.dart';
-import 'package:fashionshop_app/view/auth/sign_up.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
+import 'view/my_order.dart';
+import 'view/product_list_screen.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_up.dart';
-import 'package:flutter/foundation.dart';
 import 'package:fashionshop_app/view/home_screen.dart';
+import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
+import '../providers/cart_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
-  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => MainScreen()),
+    GoRoute(path: '/order', builder: (context, state) => MyOrderScreen()),
+    // Thêm các route khác nếu cần
+  ],
+);
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // <-- Dòng này rất quan trọng!
+
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<CartProvider>(
+          create: (_) => CartProvider(),
+        ), // Thêm dòng này
         Provider<RequestSignIn>(create: (_) => RequestSignIn()),
         Provider<RequestSignUp>(create: (_) => RequestSignUp()),
       ],
-      child: Text(""),
+      child: MyApp(),
     ),
   );
 }
 
-// class MyApp extends StatefulWidget {
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Shop App Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      // home: MainScreen(),
+      // routes: {
+      //   '/signin': (context) => SignInScreen(),
+      //   '/signup': (context) => SignUpScreen(),
+      //   '/home': (context) => HomeScreen(),
+      //   '/main_screen': (context) => MainScreen(),
+      //   '/order': (context) => MyOrderScreen(),
+      // },
+      routerConfig: _router,
+    );
+  }
+}
 
-// class _MyAppState extends State<MyApp> {
-//   StreamSubscription? _sub;
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _sub = uriLinkStream.listen((Uri? uri) {
-//       if (uri != null) {
-//         // Xử lý deeplink ở đây, ví dụ chuyển trang
-//         print('Deeplink: $uri');
-//       }
-//     });
-//   }
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  String _selectedCategoryId = '12';
 
-//   @override
-//   void dispose() {
-//     _sub?.cancel();
-//     super.dispose();
-//   }
+  @override
+  void initState() {
+    // Initialize any necessary services or data here
+    super.initState();
+    NotificationService().initialize();
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(home: MainScreen(), debugShowCheckedModeBanner: false);
-//   }
-// }
+  static final List<Widget> _screens = <Widget>[
+    HomeScreen(),
+    ProductListScreen(categoryId: '12'),
+    CartScreen(),
+    AuthGuard(child: MyOrderScreen()),
+    AccountScreen(),
+  ];
 
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Shop App Demo',
-//       debugShowCheckedModeBanner: false,
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//         visualDensity: VisualDensity.adaptivePlatformDensity,
-//       ),
-//       home: SignInScreen(),
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      if (index == 1) {
+        _screens[1] = ProductListScreen(categoryId: _selectedCategoryId);
+      }
+    });
+  }
 
-//       routes: {
-//         '/signin': (context) => SignInScreen(),
-//         '/signup': (context) => SignUpScreen(),
-//         // '/home': (context) => HomeScreen(),
-//         '/main_screen': (context) => MainScreen(),
-//       },
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'List'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'My Order'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// HomeScreen
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: Home_Screen());
+  }
+}
+
+// CartScreen
+class CartScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AuthGuard(child: Cart_Screen());
+  }
+}
+
+// AccountScreen
+class AccountScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: Account_Screen());
+  }
+}

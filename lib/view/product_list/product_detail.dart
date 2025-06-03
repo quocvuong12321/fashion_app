@@ -1,4 +1,5 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/model/Product_Detail.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
 import 'package:fashionshop_app/view/payment/payment_screen.dart';
@@ -573,7 +574,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           Stack(
             children: [
-              IconButton(icon: Icon(Icons.shopping_cart), onPressed: () {}),
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AuthGuard(child: CartScreen()),
+                    ),
+                  );
+                },
+              ),
               if (cartItemCount > 0)
                 Positioned(
                   right: 6,
