@@ -83,7 +83,6 @@ class AuthService {
       }, token: accessToken);
 
       if (response.statusCode == 200) {
-        // Update the stored user data
         final userData = jsonDecode(response.body)['result'];
         await prefs.setString('user_data', jsonEncode(userData));
       } else {

@@ -85,119 +85,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 _buildTextFormField(_nameController, 'Name'),
                 SizedBox(height: 13),
-                SizedBox(height: 13),
                 Text('Email', style: TextStyle(fontWeight: FontWeight.bold)),
                 _buildTextFormField(_emailController, 'Email'),
+                SizedBox(height: 13),
                 Text(
                   'Date of Birth',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                GestureDetector(
-                  onTap: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime(2000),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                    );
-                    if (pickedDate != null) {
-                      _dobController.text = _displayDateFormat.format(
-                        pickedDate,
-                      );
-                    }
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      controller: _dobController,
-                      decoration: InputDecoration(
-                        labelText: 'Ngày sinh',
-                        hintText: 'YYYY-MM-DD',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        suffixIcon: Icon(Icons.calendar_today),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vui lòng chọn ngày sinh';
-                        }
-                        try {
-                          _displayDateFormat.parseStrict(value);
-                        } catch (_) {
-                          return 'Sai định dạng ngày (YYYY-MM-DD)';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
+                _buildTextFormField(
+                  _dobController,
+                  'Date of Birth',
+                  dateValidation: true,
                 ),
-
                 SizedBox(height: 13),
                 Text('Gender', style: TextStyle(fontWeight: FontWeight.bold)),
                 _buildGenderDropdown(),
-                SizedBox(height: 13),
-                SizedBox(height: 13),
-
-                SizedBox(height: 13),
+                SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed:
-                          isLoading
-                              ? null
-                              : () async {
-                                if (!_formKey.currentState!.validate()) return;
-
-                                requestSignUp.setUsername(
-                                  _usernameController.text,
-                                );
-                                requestSignUp.setPassword(
-                                  _passwordController.text,
-                                );
-                                requestSignUp.setName(_nameController.text);
-
-                                try {
-                                  DateTime parsed = _displayDateFormat.parse(
-                                    _dobController.text,
-                                  );
-                                  requestSignUp.setDob(
-                                    _apiDateFormat.format(parsed),
-                                  );
-                                } catch (_) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Ngày sinh không hợp lệ.'),
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                requestSignUp.setGender(_gender ?? '');
-                                requestSignUp.setEmail(_emailController.text);
-
-                                bool success = await requestSignUp.signUp();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      success
-                                          ? 'Đăng ký thành công!'
-                                          : errorMessage,
-                                    ),
-                                    backgroundColor:
-                                        success ? Colors.green : Colors.red,
-                                  ),
-                                );
-
-                                if (success) {
-                                  await Future.delayed(Duration(seconds: 2));
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    '/signin',
-                                  );
-                                }
-                              },
+                      onPressed: isLoading ? null : _handleSignUp,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Color(0xFF2E7D32),
@@ -205,20 +114,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child:
-                          isLoading
-                              ? SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              )
-                              : Text(
-                                'Sign up',
-                                style: TextStyle(color: Colors.white),
+                      child: isLoading
+                          ? SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
                               ),
+                            )
+                          : Text(
+                              'Sign up',
+                              style: TextStyle(color: Colors.white),
+                            ),
                     ),
                   ),
                 ),
@@ -266,6 +174,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     bool dateValidation = false,
   }) {
     bool isPassword = labelText.toLowerCase().contains('password');
+    bool isEmail = labelText.toLowerCase().contains('email');
     return TextFormField(
       controller: controller,
       obscureText: isPassword ? _obscureText : obscureText,
@@ -273,53 +182,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
       decoration: InputDecoration(
         hintText: labelText,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        suffixIcon:
-            controller == _dobController
-                ? Icon(Icons.calendar_today)
-                : isPassword
+        suffixIcon: controller == _dobController
+            ? Icon(Icons.calendar_today)
+            : isPassword
                 ? IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                )
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  )
                 : null,
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return 'Please enter $labelText';
+        if (value == null || value.isEmpty) {
+          return 'Vui lòng nhập $labelText';
+        }
+
+        // Kiểm tra email
+        if (isEmail) {
+          final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+          if (!emailRegex.hasMatch(value)) {
+            return 'Email không hợp lệ';
+          }
+        }
+
+        // Kiểm tra password
+        if (isPassword) {
+          if (value.length < 6) {
+            return 'Mật khẩu phải có ít nhất 6 ký tự';
+          }
+          if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+            return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
+          }
+        }
+
+        // Kiểm tra ngày sinh
         if (dateValidation) {
           try {
-            _displayDateFormat.parseStrict(value);
+            final date = _displayDateFormat.parseStrict(value);
+            if (date.isAfter(DateTime.now())) {
+              return 'Ngày sinh không thể lớn hơn ngày hiện tại';
+            }
           } catch (_) {
-            return 'Invalid date format (YYYY-MM-DD)';
+            return 'Định dạng ngày không hợp lệ (YYYY-MM-DD)';
           }
         }
         return null;
       },
-      onTap:
-          controller == _dobController
-              ? () async {
-                DateTime initialDate = DateTime.now();
-                try {
-                  if (_dobController.text.isNotEmpty) {
-                    initialDate = _displayDateFormat.parse(_dobController.text);
-                  }
-                } catch (_) {}
-                final pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: initialDate,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
-                );
-                if (pickedDate != null) {
-                  _dobController.text = _displayDateFormat.format(pickedDate);
+      onTap: controller == _dobController
+          ? () async {
+              DateTime initialDate = DateTime.now();
+              try {
+                if (_dobController.text.isNotEmpty) {
+                  initialDate = _displayDateFormat.parse(_dobController.text);
                 }
+              } catch (_) {}
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: initialDate,
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+              if (pickedDate != null) {
+                _dobController.text = _displayDateFormat.format(pickedDate);
               }
-              : null,
+            }
+          : null,
     );
   }
 
@@ -330,47 +262,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
         labelText: 'Gender',
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      items:
-          ['Nam', 'Nữ']
-              .map(
-                (gender) =>
-                    DropdownMenuItem(value: gender, child: Text(gender)),
-              )
-              .toList(),
+      items: ['Nam', 'Nữ']
+          .map((gender) => DropdownMenuItem(value: gender, child: Text(gender)))
+          .toList(),
       onChanged: (value) => setState(() => _gender = value),
       validator: (value) => value == null ? 'Please select gender' : null,
     );
   }
 
-  Widget _buildSocialLoginButtons(
-    String text,
-    String assetPath,
-    VoidCallback onPressed,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 16),
-            side: BorderSide(color: Colors.grey.shade300, width: 1),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Image.asset(assetPath, height: 24, width: 24),
-              ),
-              SizedBox(width: 80),
-              Text(text, style: TextStyle(color: Colors.black)),
-            ],
-          ),
+  Future<void> _handleSignUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final requestSignUp = Provider.of<RequestSignUp>(context, listen: false);
+    requestSignUp.setUsername(_usernameController.text);
+    requestSignUp.setPassword(_passwordController.text);
+    requestSignUp.setName(_nameController.text);
+
+    try {
+      DateTime parsed = _displayDateFormat.parse(_dobController.text);
+      requestSignUp.setDob(_apiDateFormat.format(parsed));
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ngày sinh không hợp lệ.'),
+          backgroundColor: Colors.red,
         ),
+      );
+      return;
+    }
+
+    requestSignUp.setGender(_gender ?? '');
+    requestSignUp.setEmail(_emailController.text);
+
+    bool success = await requestSignUp.signUp();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success ? 'Đăng ký thành công!' : requestSignUp.errorMessage,
+        ),
+        backgroundColor: success ? Colors.green : Colors.red,
+        duration: Duration(seconds: success ? 2 : 4),
       ),
     );
+
+    if (success) {
+      await Future.delayed(Duration(seconds: 2));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SignInScreen()),
+      );
+    }
   }
 }

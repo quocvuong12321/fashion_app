@@ -10,6 +10,7 @@ import '../RequestAPI/Token.dart';
 import '../RequestAPI/Request_Product.dart';
 import 'product_list/product_detail.dart';
 import 'package:image_picker/image_picker.dart';
+import 'profile/account_screen.dart';
 
 class Home_Screen extends StatefulWidget {
   @override
@@ -216,6 +217,7 @@ class _HomeScreenState extends State<Home_Screen> {
       children: [
         Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             title: const Text(
               'Fashionista',
               style: TextStyle(
@@ -225,28 +227,30 @@ class _HomeScreenState extends State<Home_Screen> {
               ),
             ),
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AccountScreen()),
+                  );
+                },
                 child: Row(
                   children: [
-                    // Ảnh đại diện người dùng
                     if (imageUrl != null && imageUrl.isNotEmpty)
                       CircleAvatar(backgroundImage: NetworkImage(imageUrl))
                     else
                       const Icon(Icons.account_circle, size: 30),
                     const SizedBox(width: 8),
                     Text(name, style: const TextStyle(fontSize: 16)),
+                    const SizedBox(width: 16),
                   ],
                 ),
               ),
             ],
           ),
-
           body:
               _loading
-                  ? const Center(
-                    child: CircularProgressIndicator(),
-                  ) // Hiển thị loading khi đang tải
+                  ? const Center(child: CircularProgressIndicator())
                   : Column(
                     children: [
                       // Ô tìm kiếm sản phẩm
@@ -261,8 +265,7 @@ class _HomeScreenState extends State<Home_Screen> {
                                   hintText: 'Tìm kiếm sản phẩm...',
                                   prefixIcon: IconButton(
                                     icon: const Icon(Icons.search),
-                                    onPressed:
-                                        _onSemanticSearch, // Gọi tìm kiếm ngữ nghĩa
+                                    onPressed: _onSemanticSearch,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),

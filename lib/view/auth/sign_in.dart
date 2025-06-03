@@ -27,6 +27,7 @@ class _SignInScreenState extends State<SignInScreen> {
     requestSignIn.setPassword(_passwordController.text);
 
     bool success = await requestSignIn.signIn();
+    if (!mounted) return;
 
     if (success) {
       Navigator.push(

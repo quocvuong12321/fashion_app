@@ -71,7 +71,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  String _selectedCategoryId = '12';
+  String _selectedCategoryId = '';
 
   @override
   void initState() {
@@ -82,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static final List<Widget> _screens = <Widget>[
     HomeScreen(),
-    ProductListScreen(categoryId: '12'),
+    ProductListScreen(),
     CartScreen(),
     AuthGuard(child: MyOrderScreen()),
     AccountScreen(),

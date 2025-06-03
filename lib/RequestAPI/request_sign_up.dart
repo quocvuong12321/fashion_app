@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 class RequestSignUp {
   String username = '';
@@ -162,6 +163,23 @@ class RequestSignUp {
       errorMessage = 'Lỗi không xác định: $e';
       print('Lỗi không xác định: $errorMessage');
       isLoading = false;
+      return false;
+    }
+  }
+
+  Future<bool> checkUsername(String username) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiService.UrlHien}user/account/check_username?username=$username'),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['exists'] ?? false; // API trả về true nếu username đã tồn tại
+      }
+      return false;
+    } catch (e) {
+      print('Error checking username: $e');
       return false;
     }
   }

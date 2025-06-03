@@ -154,4 +154,27 @@ class Request_Products {
       throw Exception("Failed to load product detail");
     }
   }
+
+  static Future<List<Product>> fetchRelatedProducts(String categoryId, String currentProductId) async {
+    try {
+      final url = Uri.parse("$baseUrl?category_id=$categoryId&limit=10");
+      print("Fetching related products from URL: $url");
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final productsJson = jsonData['products'] as List;
+        // Lọc bỏ sản phẩm hiện tại khỏi danh sách
+        return productsJson
+            .map((e) => Product.fromJson(e))
+            .where((product) => product.productSpuId != currentProductId)
+            .toList();
+      } else {
+        throw Exception("Failed to load related products");
+      }
+    } catch (e) {
+      print("Error fetching related products: $e");
+      return [];
+    }
+  }
 }
