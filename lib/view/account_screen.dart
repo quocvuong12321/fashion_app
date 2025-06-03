@@ -4,6 +4,9 @@ import 'package:fashionshop_app/RequestAPI/Token.dart';
 import '../view/auth/update_password.dart';
 import '../view/auth/sign_in.dart';
 import '../RequestAPI/request_sign_in.dart';
+import '../view/profile/edit_profile_screen.dart';
+import '../model/Customer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Account_Screen extends StatefulWidget {
   const Account_Screen({Key? key}) : super(key: key);
@@ -27,7 +30,7 @@ class _AccountScreenState extends State<Account_Screen> {
     loadUserInfo();
   }
 
-  // Hàm tải thông tin người dùng từ local
+  //Hàm tải thông tin người dùng từ local
   Future<void> loadUserInfo() async {
     final storedUsername = await AuthStorage.getUsername();
     final userInfo = await AuthStorage.getUserInfo();
@@ -90,6 +93,12 @@ class _AccountScreenState extends State<Account_Screen> {
       final success = await requestSignIn.logout(); // Gọi API đăng xuất
       if (success) {
         // Xoá thông tin người dùng trong app
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('token');
+        await prefs.remove('user_id');
+        await prefs.remove('user_data');
+        // Nếu bạn lưu thêm thông tin khác, hãy xoá hết ở đây
+
         setState(() {
           isLoggingOut = false;
           username = null;
@@ -272,11 +281,31 @@ class _AccountScreenState extends State<Account_Screen> {
                             ),
                           ),
                           onPressed: () {
-                            // chuyển đến UpdateProfileScreen (mở comment để sử dụng)
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => UpdateProfileScreen()),
-                            // );
+                            final currentUser = Customer(
+                              customerId: username ?? '',
+                              name: name ?? '',
+                              email: email ?? '',
+                              image: imageUrl ?? '',
+                              dob:
+                                  dob != null && dob!.isNotEmpty
+                                      ? DateTime.parse(dob!)
+                                      : DateTime(2000, 1, 1),
+                              gender: gender ?? '',
+                              accountId:
+                                  username ??
+                                  '', // nếu accountId khác, hãy truyền biến accountId thay vì username
+                              createDate:
+                                  DateTime.now(), // Nếu không lưu dưới local, để DateTime.now() hoặc mặc định
+                              updateDate: DateTime.now(),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        EditProfileScreen(user: currentUser),
+                              ),
+                            );
                           },
                         ),
                       ],

@@ -15,13 +15,10 @@ class AuthResponse {
 class AuthService {
   Future<AuthResponse?> login(String email, String password) async {
     try {
-      final response = await ApiService.post(
-        '/user/account/login',
-        {
-          'email': email,
-          'password': password,
-        },
-      );
+      final response = await ApiService.post('/user/account/login', {
+        'email': email,
+        'password': password,
+      });
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -33,7 +30,9 @@ class AuthService {
         await prefs.setString('token', token);
         await prefs.setString('user_id', user.customerId);
         await prefs.setString(
-            'user_data', jsonEncode(jsonResponse['result']['customer']));
+          'user_data',
+          jsonEncode(jsonResponse['result']['customer']),
+        );
 
         return AuthResponse(user: user, token: token);
       } else {
@@ -73,9 +72,13 @@ class AuthService {
   Future<void> updateUserInfo(Customer user) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+      final token = prefs.getString('token');
+      if (token == null || token.isEmpty) {
+        print('Chưa đăng nhập hoặc token bị thiếu!');
+        throw Exception('Bạn cần đăng nhập trước khi cập nhật thông tin!');
+      }
       print("token = $token");
-      final response = await ApiService.put(
+      final response = await ApiService.patch(
         '/user/info/update_customer',
         {
           'name': user.name,
@@ -87,7 +90,6 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        // Update the stored user data
         final userData = jsonDecode(response.body)['result'];
         await prefs.setString('user_data', jsonEncode(userData));
       } else {
@@ -107,14 +109,10 @@ class AuthService {
 
       // TODO: Implement image upload functionality
       // This would typically involve multipart/form-data
-      final response = await ApiService.post(
-        '/user/info/update_avatar',
-        {
-          'customer_id': userId,
-          'image_path': imagePath,
-        },
-        token: token,
-      );
+      final response = await ApiService.post('/user/info/update_avatar', {
+        'customer_id': userId,
+        'image_path': imagePath,
+      }, token: token);
 
       if (response.statusCode != 200) {
         throw Exception('Failed to update avatar: ${response.statusCode}');

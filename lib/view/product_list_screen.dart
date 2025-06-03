@@ -13,14 +13,15 @@ import '../RequestAPI/api_Services.dart';
 import '../model/products_respone.dart';
 
 class ProductListScreen extends StatefulWidget {
-  final String categoryId;
-  const ProductListScreen({required this.categoryId, super.key});
+  final String? categoryId; // Cho phép null
+  const ProductListScreen({this.categoryId, super.key});
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
+  String? _currentCategoryId; // Thay vì sửa widget.categoryId
   List<Product> products = [];
   List<Product> filteredProducts = [];
   String selectedCategoryName = "";
@@ -33,16 +34,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   void initState() {
     super.initState();
+    _currentCategoryId = widget.categoryId;
     fetchProducts(1, limit);
 
     _scrollController.addListener(() {
       print(
-        'pixels: ${_scrollController.position.pixels}, max: ${_scrollController.position.maxScrollExtent}',
+        '==> Listener: currentPage: $currentPage, totalPages: $totalPages, isFiltering: $isFiltering',
       );
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent - 200 &&
           !isLoading &&
-          currentPage < totalPages) {
+          currentPage < totalPages &&
+          !isFiltering) {
         final nextPage = currentPage + 1;
         print(
           '==> SCROLL GỌI fetchProducts với page: $nextPage, currentPage hiện tại: $currentPage',
@@ -81,6 +84,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Future<void> fetchProducts(int page, int limit) async {
+    print(
+      '==> fetchProducts gọi với page: $page, _currentCategoryId: $_currentCategoryId',
+    );
     if (isLoading) return;
     setState(() {
       isLoading = true;
@@ -89,7 +95,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       final response = await Request_Products.fetchProductsResponse(
         page: page,
         limit: limit,
-        categoryId: widget.categoryId,
+        categoryId: _currentCategoryId,
       );
       setState(() {
         if (page == 1) {
@@ -109,6 +115,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
         isLoading = false;
       });
     }
+    print(
+      'Sau fetchProducts: products.length = ${products.length}, currentPage = $currentPage',
+    );
   }
 
   @override
@@ -123,43 +132,54 @@ class _ProductListScreenState extends State<ProductListScreen> {
     double minPrice,
     double maxPrice,
   ) async {
-    setState(() {
-      isFiltering = true;
-      products = [];
-      currentPage = 1;
-    });
-    print('Filter/Sắp xếp, reset products');
-
-    try {
-      List<Product> fetched = [];
-      if (selectedCategories.isNotEmpty) {
-        // Fetch products for each selected category
+    if (selectedCategories.length == 1) {
+      setState(() {
+        isFiltering = false;
+        _currentCategoryId = selectedCategories.first;
+        currentPage = 1; // luôn reset về trang đầu
+        totalPages = 1;
+        products = []; // reset danh sách sản phẩm
+      });
+      fetchProducts(1, limit); // luôn gọi lại trang 1
+    } else if (selectedCategories.isEmpty) {
+      setState(() {
+        isFiltering = false;
+        _currentCategoryId = null;
+        currentPage = 1;
+        totalPages = 1;
+        products = [];
+      });
+      fetchProducts(1, limit); // luôn gọi lại trang 1
+    } else {
+      // Nếu chọn nhiều danh mục, chỉ filter local, không phân trang
+      setState(() {
+        isFiltering = true;
+        products = [];
+        currentPage = 1;
+        totalPages = 1;
+      });
+      print('Filter/Sắp xếp, reset products');
+      try {
+        List<Product> fetched = [];
         for (String categoryId in selectedCategories) {
           final categoryProducts =
               await Request_Products.fetchProductsByCategory(categoryId);
           fetched.addAll(categoryProducts);
         }
-      } else {
-        fetched = await Request_Products.fetchProductsResponse(
-          page: currentPage,
-          limit: limit,
-        ).then((response) => response.products);
+        setState(() {
+          filteredProducts = fetched
+              .where(
+                (product) =>
+                    product.price >= minPrice && product.price <= maxPrice,
+              )
+              .toList();
+        });
+      } catch (e) {
+        print("Error filtering products: $e");
+        setState(() {
+          isFiltering = false;
+        });
       }
-
-      setState(() {
-        filteredProducts =
-            fetched.where((product) {
-              final matchesPrice =
-                  product.price >= minPrice && product.price <= maxPrice;
-              return matchesPrice;
-            }).toList();
-        isFiltering = false;
-      });
-    } catch (e) {
-      print("Error filtering products: $e");
-      setState(() {
-        isFiltering = false;
-      });
     }
   }
 
@@ -205,7 +225,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
       body: Stack(
         children: [
-          if (isLoading || isFiltering)
+          if ((isLoading && products.isEmpty) || isFiltering)
             Center(
               child: Text(
                 "Đang tải dữ liệu, vui lòng đợi...",

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'Token.dart';
 
 class ApiService {
-  static const String UrlHien = 'http://192.168.10.111:8080/v1/';
+  static const String UrlHien = 'https://e9c5-113-161-44-249.ngrok-free.app/v1/';
   static const String UrlVuong = 'http://192.168.10.111:5000/';
   static Future<String?> token = AuthStorage.getRefreshToken();
 
@@ -73,6 +73,24 @@ class ApiService {
     );
     _handleErrors(response);
     return response;
+  }
+
+  /// PATCH
+  static Future<http.Response> patch(
+    String url,
+    Map<String, dynamic> body, {
+    String baseUrl = UrlHien,
+    String? token,
+  }) async {
+    final uri = Uri.parse(baseUrl + url);
+    return await http.patch(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
   }
 
   // Optional: Error handler

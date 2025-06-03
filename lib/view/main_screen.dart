@@ -10,6 +10,7 @@ import 'package:fashionshop_app/RequestAPI/request_sign_up.dart';
 import 'package:fashionshop_app/view/home_screen.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
 import '../providers/cart_provider.dart';
+import '../providers/auth_provider.dart';
 
 final GoRouter _router = GoRouter(
   initialLocation: '/',
@@ -24,6 +25,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider<CartProvider>(
           create: (_) => CartProvider(),
         ), // Thêm dòng này
@@ -65,11 +67,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  String _selectedCategoryId = '12';
+  String _selectedCategoryId = '';
 
   static final List<Widget> _screens = <Widget>[
     HomeScreen(),
-    ProductListScreen(categoryId: '12'),
+    ProductListScreen(),
     CartScreen(),
     AuthGuard(child: MyOrderScreen()),
     AccountScreen(),

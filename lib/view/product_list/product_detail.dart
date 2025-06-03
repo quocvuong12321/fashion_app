@@ -1,6 +1,7 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
 import 'package:fashionshop_app/model/Product_Detail.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
+import 'package:fashionshop_app/view/cart_screen.dart';
 import 'package:fashionshop_app/view/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -189,9 +190,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         stockAvailable = match.skuStock;
         currentPrice = match.price;
         if (quantity > stockAvailable) {
-          quantity = stockAvailable;
+          quantity = stockAvailable > 0 ? 1 : 0;
         }
-        ;
+        if (quantity < 1 && stockAvailable > 0) {
+          quantity = 1;
+        }
       });
     }
 
@@ -573,7 +576,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           Stack(
             children: [
-              IconButton(icon: Icon(Icons.shopping_cart), onPressed: () {}),
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Cart_Screen()),
+                  );
+                },
+              ),
               if (cartItemCount > 0)
                 Positioned(
                   right: 6,
