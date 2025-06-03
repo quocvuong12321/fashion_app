@@ -1,12 +1,16 @@
+import 'package:fashionshop_app/view/my_order.dart';
+import 'package:fashionshop_app/view/product_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
 import '../../model/Customer.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../RequestAPI/AuthStorage.dart';
+import 'package:fashionshop_app/view/auth/sign_in.dart';
 import '../address/manager_address_screen.dart';
 import 'edit_profile_screen.dart';
+import 'package:fashionshop_app/view/auth/update_password.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({Key? key}) : super(key: key);
@@ -16,7 +20,9 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  final Color primaryColor = const Color.fromARGB(255, 2, 150, 102);
   Map<String, String?>? _cachedUserInfo;
+  bool isLoggingOut = false;
 
   @override
   void initState() {
@@ -27,36 +33,36 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _loadData() async {
-    // Load cached user data first
     final userInfo = await AuthStorage.getUserInfo();
     setState(() {
       _cachedUserInfo = userInfo;
     });
 
-    // Then try to load fresh profile data
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
     await profileProvider.loadUserProfile();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final authProvider = Provider.of<AuthProvider>(context);
     final profileProvider = Provider.of<ProfileProvider>(context);
 
-    // Use profile data if available, otherwise fall back to auth user data or cached data
     Customer? user = profileProvider.userProfile ?? authProvider.user;
 
-    // If no user data from providers, try to create a Customer from cached data
     if (user == null && _cachedUserInfo != null) {
       try {
         user = Customer(
-          customerId: '', // This will be empty as it's not stored in cache
-          accountId: '', // Adding the required accountId parameter
+          customerId: '',
+          accountId: '',
           name: _cachedUserInfo!['name'] ?? '',
           email: _cachedUserInfo!['email'] ?? '',
           gender: _cachedUserInfo!['gender'] ?? '',
-          dob: DateTime.tryParse(_cachedUserInfo!['dob'] ?? '') ?? DateTime.now(),
+          dob:
+              DateTime.tryParse(_cachedUserInfo!['dob'] ?? '') ??
+              DateTime.now(),
           image: _cachedUserInfo!['image'] ?? '',
           createDate: DateTime.now(),
           updateDate: DateTime.now(),
@@ -67,23 +73,21 @@ class _AccountScreenState extends State<AccountScreen> {
     }
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("My Account"),
         centerTitle: true,
-        backgroundColor: theme.primaryColor,
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadData),
         ],
       ),
-      body: profileProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : user == null
+      body:
+          profileProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : user == null
               ? _buildNotLoggedIn(context)
               : _buildUserProfile(context, user),
     );
@@ -100,12 +104,15 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           const SizedBox(height: 16),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
             onPressed: () {
-              // Navigate to login screen - you'll need to implement this
-              // Navigator.pushNamed(context, '/login');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignInScreen()),
+              );
             },
             child: const Text("Login Now"),
-          )
+          ),
         ],
       ),
     );
@@ -128,18 +135,20 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildProfileHeader(Customer user) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundImage: user.image.isNotEmpty ? NetworkImage(user.image) : null,
+              backgroundImage:
+                  user.image.isNotEmpty ? NetworkImage(user.image) : null,
               backgroundColor: Colors.grey.shade200,
-              child: user.image.isEmpty ? const Icon(Icons.person, size: 40, color: Colors.grey) : null,
+              child:
+                  user.image.isEmpty
+                      ? const Icon(Icons.person, size: 40, color: Colors.grey)
+                      : null,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -156,18 +165,12 @@ class _AccountScreenState extends State<AccountScreen> {
                   const SizedBox(height: 4),
                   Text(
                     user.email,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "Member since: ${_formatDate(user.createDate)}",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),
@@ -175,6 +178,7 @@ class _AccountScreenState extends State<AccountScreen> {
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () => _navigateToEditProfile(user),
+              color: primaryColor,
             ),
           ],
         ),
@@ -185,9 +189,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildMenuSection(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(
@@ -197,41 +199,46 @@ class _AccountScreenState extends State<AccountScreen> {
               "My Addresses",
               () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ManagerAddressScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const ManagerAddressScreen(),
+                ),
               ),
             ),
             const Divider(height: 1),
             _buildMenuItem(
               Icons.shopping_bag,
               "My Orders",
-              () {
-                // Navigate to orders
-                // Navigator.pushNamed(context, '/orders');
-              },
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyOrderScreen()),
+              ),
             ),
             const Divider(height: 1),
             _buildMenuItem(
               Icons.favorite,
               "My Wishlist",
-              () {
-                // Navigate to wishlist
-                // Navigator.pushNamed(context, '/wishlist');
-              },
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => ProductListScreen(categoryId: 'wishlist'),
+                ),
+              ),
             ),
-            const Divider(height: 1),
-            _buildMenuItem(
-              Icons.settings,
-              "Settings",
-              () {
-                // Navigate to settings
-                // Navigator.pushNamed(context, '/settings');
-              },
-            ),
+            _buildMenuItem(Icons.settings, "Change Password", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UpdatePasswordScreen(),
+                ),
+              );
+            }),
+
             const Divider(height: 1),
             _buildMenuItem(
               Icons.logout,
               "Logout",
-              _logout,
+              confirmLogout,
               color: Colors.redAccent,
             ),
           ],
@@ -240,13 +247,18 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap, {Color? color}) {
+  Widget _buildMenuItem(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    Color? color,
+  }) {
     return ListTile(
-      leading: Icon(icon, color: color),
+      leading: Icon(icon, color: color ?? primaryColor),
       title: Text(
         title,
         style: TextStyle(
-          color: color,
+          color: color ?? Colors.black,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -258,20 +270,59 @@ class _AccountScreenState extends State<AccountScreen> {
   void _navigateToEditProfile(Customer user) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditProfileScreen(user: user),
-      ),
+      MaterialPageRoute(builder: (context) => EditProfileScreen(user: user)),
     );
-  }
-
-  void _logout() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.logout();
-    // You might want to navigate to login screen after logout
-    // Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
   String _formatDate(DateTime date) {
     return "${date.day}/${date.month}/${date.year}";
+  }
+
+  // Hàm xác nhận và xử lý đăng xuất
+  Future<void> confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Xác nhận đăng xuất'),
+            content: const Text('Bạn có chắc muốn đăng xuất không?'),
+            actions: [
+              TextButton(
+                child: const Text('Huỷ'),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              TextButton(
+                child: const Text('Đăng xuất'),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        isLoggingOut = true;
+      });
+      final requestSignIn = RequestSignIn();
+      final success = await requestSignIn.logout(); // Gọi API đăng xuất
+
+      if (success) {
+        setState(() {
+          isLoggingOut = false;
+          _cachedUserInfo = null;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignInScreen()),
+        );
+      } else {
+        setState(() {
+          isLoggingOut = false;
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(requestSignIn.errorMessage)));
+      }
+    }
   }
 }

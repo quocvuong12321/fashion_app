@@ -1,7 +1,9 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/services/fire-base.dart';
 import 'package:fashionshop_app/view/account_screen.dart';
 import 'package:fashionshop_app/view/cart_screen.dart';
+import 'package:fashionshop_app/view/profile/account_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -137,9 +139,9 @@ class CartScreen extends StatelessWidget {
 }
 
 // AccountScreen
-class AccountScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Account_Screen());
-  }
-}
+// class AccountScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(body: AccountScreen());
+//   }
+// }
