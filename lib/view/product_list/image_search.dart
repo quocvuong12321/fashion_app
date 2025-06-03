@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:fashionshop_app/RequestAPI/Request_ImageSearch.dart';
+import 'package:fashionshop_app/RequestAPI/Request_Search.dart';
 import 'package:fashionshop_app/view/product_list/result_search.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,7 +31,7 @@ void showPickImageDialog(
                 File? imageFile = await pickImage(ImageSource.camera);
                 if (imageFile != null) {
                   try {
-                    final products = await RequestImageSearch().searchImage(
+                    final products = await RequestSearch().searchImage(
                       imageFile.path,
                     );
                     if (Navigator.of(parentContext).mounted) {
@@ -68,7 +68,7 @@ void showPickImageDialog(
                 File? imageFile = await pickImage(ImageSource.gallery);
                 if (imageFile != null) {
                   try {
-                    final products = await RequestImageSearch().searchImage(
+                    final products = await RequestSearch().searchImage(
                       imageFile.path,
                     );
                     if (Navigator.of(parentContext).mounted) {

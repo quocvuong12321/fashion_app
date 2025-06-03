@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:fashionshop_app/RequestAPI/api_Services.dart';
+import 'package:fashionshop_app/model/Cancel_Order_Result.dart';
 import '../model/Order.dart';
 import 'Token.dart';
 
@@ -43,22 +44,26 @@ class Request_Order {
     return '${ApiService.UrlHien}media/avatar/$imagePath';
   }
 
-  static Future<void> cancelOrder(String orderId) async {
-    try {
-      final accessToken = await AuthStorage.getRefreshToken();
-      if (accessToken == null) throw Exception('Access token is null');
-      final response = await ApiService.put('order/cancel_order', {
-        'order_id': orderId,
-      }, token: accessToken);
-
-      if (response.statusCode == 200) {
-        print('Order canceled successfully');
-      } else {
-        print('Failed to cancel order: ${response.body}');
-      }
-    } catch (e) {
-      print('Error canceling order: $e');
+  static Future<CancelOrderResult> cancelOrder(String orderId) async {
+    // try {
+    final accessToken = await AuthStorage.getRefreshToken();
+    if (accessToken == null) throw Exception('Access token is null');
+    final response = await ApiService.put('order/cancel_order', {
+      'order_id': orderId,
+    }, token: accessToken);
+    final Map<String, dynamic> data = jsonDecode(response.body);
+    final String massage = data['message'] ?? 'No message provided';
+    final int code = data['code'] ?? response.statusCode;
+    if (response.statusCode == 200) {
+      print(massage);
+    } else {
+      print('\x1B[31m${massage}\x1B[0m');
     }
+    return new CancelOrderResult(message: massage, code: code);
+    // } catch (e) {
+    //   print('Error canceling order: $e');
+    //   return CancelOrderResult(message: 'Error canceling order: $e', code: -1);
+    // }
   }
 
   static Future<bool> feedBack(

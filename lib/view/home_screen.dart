@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fashionshop_app/RequestAPI/Request_Search.dart';
 import 'package:fashionshop_app/view/product_list/image_search.dart';
+import 'package:fashionshop_app/view/product_list/result_search.dart';
 import 'package:flutter/material.dart';
 import '../model/Product.dart';
 import '../view/product_list/product_card.dart';
@@ -144,6 +146,30 @@ class _HomeScreenState extends State<Home_Screen> {
     });
   }
 
+  void _onSemanticSearch() async {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) return;
+    setState(() => _loadingImageSearch = true);
+    try {
+      final products = await RequestSearch().searchByText(query);
+      if (!mounted) return;
+      setState(() => _loadingImageSearch = false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultSearch(products: products),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loadingImageSearch = false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra khi tìm kiếm')));
+      }
+    }
+  }
+
   // Giao diện danh sách sản phẩm theo dạng lưới
   Widget _buildProductGrid() {
     if (_filteredProducts.isEmpty) {
@@ -233,12 +259,16 @@ class _HomeScreenState extends State<Home_Screen> {
                                 controller: _searchController,
                                 decoration: InputDecoration(
                                   hintText: 'Tìm kiếm sản phẩm...',
-                                  prefixIcon: const Icon(Icons.search),
+                                  prefixIcon: IconButton(
+                                    icon: const Icon(Icons.search),
+                                    onPressed:
+                                        _onSemanticSearch, // Gọi tìm kiếm ngữ nghĩa
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                onChanged: _onSearchChanged,
+                                onSubmitted: (_) => _onSemanticSearch(),
                               ),
                             ),
                             const SizedBox(width: 8),

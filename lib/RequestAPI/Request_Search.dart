@@ -3,7 +3,7 @@ import 'package:fashionshop_app/model/Product.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
-class RequestImageSearch {
+class RequestSearch {
   final Dio _dio = Dio(BaseOptions(baseUrl: ApiService.UrlVuong));
   Future<List<Product>> searchImage(String imagePath) async {
     try {
@@ -30,6 +30,27 @@ class RequestImageSearch {
       }
     } catch (e) {
       print('Error in searchImage: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Product>> searchByText(String query) async {
+    try {
+      final response = await _dio.post(
+        '/products/semantic-search',
+        data: {'query': query},
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        List<dynamic> productList = data['products'];
+        return productList.map((item) => Product.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Error in searchByText: $e');
       rethrow;
     }
   }

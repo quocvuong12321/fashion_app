@@ -341,16 +341,19 @@ class _Order_DetailsState extends State<Order_Details> {
                                     false;
 
                                 if (confirm) {
-                                  await Request_Order.cancelOrder(
-                                    widget.orderSeleted.order_id!,
-                                  );
-
+                                  final result =
+                                      await Request_Order.cancelOrder(
+                                        widget.orderSeleted.order_id!,
+                                      );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Đơn hàng đã được hủy.'),
+                                      content: Text(result.message),
+                                      backgroundColor:
+                                          result.code == 200
+                                              ? Colors.green
+                                              : Colors.red,
                                     ),
                                   );
-
                                   Navigator.pop(
                                     context,
                                     true,
