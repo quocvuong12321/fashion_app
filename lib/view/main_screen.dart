@@ -1,4 +1,5 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/services/fire-base.dart';
 import 'package:fashionshop_app/view/account_screen.dart';
 import 'package:fashionshop_app/view/cart_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:fashionshop_app/RequestAPI/request_sign_up.dart';
 import 'package:fashionshop_app/view/home_screen.dart';
 import 'package:fashionshop_app/RequestAPI/request_sign_in.dart';
 import '../providers/cart_provider.dart';
-import '../providers/auth_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 final GoRouter _router = GoRouter(
   initialLocation: '/',
@@ -21,11 +22,13 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // <-- Dòng này rất quan trọng!
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider<CartProvider>(
           create: (_) => CartProvider(),
         ), // Thêm dòng này
@@ -68,6 +71,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   String _selectedCategoryId = '';
+
+  @override
+  void initState() {
+    // Initialize any necessary services or data here
+    super.initState();
+    NotificationService().initialize();
+  }
 
   static final List<Widget> _screens = <Widget>[
     HomeScreen(),

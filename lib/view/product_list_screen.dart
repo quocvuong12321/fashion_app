@@ -1,4 +1,3 @@
-import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'product_list/product_card.dart';
@@ -10,7 +9,6 @@ import 'dart:convert';
 import 'product_list/product_detail.dart';
 import '/RequestAPI/Request_Product.dart';
 import '../RequestAPI/api_Services.dart';
-import '../model/products_respone.dart';
 
 class ProductListScreen extends StatefulWidget {
   final String? categoryId; // Cho phép null
@@ -31,9 +29,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
   bool isLoading = false;
   final int limit = 20;
   final ScrollController _scrollController = ScrollController();
+  late TextEditingController _searchController;
+  String _searchQuery = '';
+  bool _isSearching = false;
+
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController(text: _searchQuery);
     _currentCategoryId = widget.categoryId;
     fetchProducts(1, limit);
 
@@ -83,7 +86,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  Future<void> fetchProducts(int page, int limit) async {
+  Future<void> fetchProducts(
+    int page,
+    int limit, {
+    double? minPrice,
+    double? maxPrice,
+  }) async {
     print(
       '==> fetchProducts gọi với page: $page, _currentCategoryId: $_currentCategoryId',
     );
@@ -97,11 +105,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
         limit: limit,
         categoryId: _currentCategoryId,
       );
+      List<Product> fetchedProducts = response.products;
+      // Lọc theo giá nếu có
+      if (minPrice != null && maxPrice != null) {
+        fetchedProducts =
+            fetchedProducts
+                .where(
+                  (product) =>
+                      product.price >= minPrice && product.price <= maxPrice,
+                )
+                .toList();
+      }
       setState(() {
         if (page == 1) {
-          products = response.products;
+          products = fetchedProducts;
         } else {
-          products.addAll(response.products);
+          products.addAll(fetchedProducts);
         }
         filteredProducts = List.from(products);
         totalPages = response.totalPages;
@@ -122,6 +141,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -140,7 +160,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
         totalPages = 1;
         products = []; // reset danh sách sản phẩm
       });
-      fetchProducts(1, limit); // luôn gọi lại trang 1
+      fetchProducts(
+        1,
+        limit,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      ); // truyền giá trị lọc giá
     } else if (selectedCategories.isEmpty) {
       setState(() {
         isFiltering = false;
@@ -149,7 +174,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
         totalPages = 1;
         products = [];
       });
-      fetchProducts(1, limit); // luôn gọi lại trang 1
+      fetchProducts(
+        1,
+        limit,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      ); // truyền giá trị lọc giá
     } else {
       // Nếu chọn nhiều danh mục, chỉ filter local, không phân trang
       setState(() {
@@ -167,12 +197,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
           fetched.addAll(categoryProducts);
         }
         setState(() {
-          filteredProducts = fetched
-              .where(
-                (product) =>
-                    product.price >= minPrice && product.price <= maxPrice,
-              )
-              .toList();
+          filteredProducts =
+              fetched
+                  .where(
+                    (product) =>
+                        product.price >= minPrice && product.price <= maxPrice,
+                  )
+                  .toList();
         });
       } catch (e) {
         print("Error filtering products: $e");
@@ -212,78 +243,170 @@ class _ProductListScreenState extends State<ProductListScreen> {
     });
   }
 
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      final normalizedQuery = removeDiacritics(query.toLowerCase());
+      filteredProducts =
+          query.isEmpty
+              ? List.from(products)
+              : products.where((p) {
+                final normalizedName = removeDiacritics(p.name.toLowerCase());
+                return normalizedName.contains(normalizedQuery);
+              }).toList();
+    });
+  }
+
+  String removeDiacritics(String str) {
+    // Chuyển tiếng Việt có dấu thành không dấu
+    const withDiacritics =
+        'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ'
+        'ÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ';
+    const withoutDiacritics =
+        'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd'
+        'AAAAAAAAAAAAAAAAAEEEEEEEEEEEIIIIIOOOOOOOOOOOOOOOOOUUUUUUUUUUUYYYYYD';
+
+    for (int i = 0; i < withDiacritics.length; i++) {
+      str = str.replaceAll(withDiacritics[i], withoutDiacritics[i]);
+    }
+    return str;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Product List ${selectedCategoryName.isEmpty ? '' : selectedCategoryName}",
-          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
-        ),
+        title:
+            !_isSearching
+                ? Text(
+                  "Product List ${selectedCategoryName.isEmpty ? '' : selectedCategoryName}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                  ),
+                )
+                : TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Tìm kiếm sản phẩm...',
+                    border: InputBorder.none,
+                    suffixIcon:
+                        _searchController.text.isNotEmpty
+                            ? IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                  _onSearchChanged('');
+                                });
+                              },
+                            )
+                            : null,
+                  ),
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                  onChanged: _onSearchChanged,
+                ),
         centerTitle: true,
+        leading:
+            !_isSearching
+                ? IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MainScreen()),
+                    );
+                  },
+                  icon: Icon(Icons.arrow_back),
+                )
+                : IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = false;
+                    });
+                  },
+                ),
+        actions: [
+          if (!_isSearching)
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                setState(() {
+                  _isSearching = true;
+                });
+              },
+            ),
+          // KHÔNG để Icon X ở actions khi _isSearching == true
+        ],
       ),
-
       body: Stack(
         children: [
-          if ((isLoading && products.isEmpty) || isFiltering)
-            Center(
-              child: Text(
-                "Đang tải dữ liệu, vui lòng đợi...",
-                style: TextStyle(fontSize: 16),
-              ),
-            )
-          else if (filteredProducts.isEmpty)
-            Center(
-              child: Text(
-                "Không có sản phẩm nào thuộc danh mục này!",
-                style: TextStyle(fontSize: 16),
-              ),
-            )
-          else
-            Column(
-              children: [
-                Expanded(
-                  child: GridView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 80),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.55,
-                          crossAxisSpacing: 2,
-                          mainAxisSpacing: 2,
+          Column(
+            children: [
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    if ((isLoading && products.isEmpty) || isFiltering)
+                      return Center(
+                        child: Text(
+                          "Đang tải dữ liệu, vui lòng đợi...",
+                          style: TextStyle(fontSize: 16),
                         ),
-                    itemCount:
-                        filteredProducts.length +
-                        (isLoading && currentPage <= totalPages && !isFiltering
-                            ? 1
-                            : 0),
-                    itemBuilder: (context, index) {
-                      if (index == filteredProducts.length) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                      final product = filteredProducts[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => ProductDetailScreen(
-                                    productSpuId: product.productSpuId,
-                                  ),
+                      );
+                    else if (filteredProducts.isEmpty)
+                      return Center(
+                        child: Text(
+                          "Không có sản phẩm nào thuộc danh mục này!",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      );
+                    else
+                      return GridView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.only(bottom: 80),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.55,
+                              crossAxisSpacing: 2,
+                              mainAxisSpacing: 2,
                             ),
+                        itemCount:
+                            filteredProducts.length +
+                            (isLoading &&
+                                    currentPage <= totalPages &&
+                                    !isFiltering
+                                ? 1
+                                : 0),
+                        itemBuilder: (context, index) {
+                          if (index == filteredProducts.length) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          final product = filteredProducts[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => ProductDetailScreen(
+                                        productSpuId: product.productSpuId,
+                                      ),
+                                ),
+                              );
+                            },
+                            child: ProductCard(product: product),
                           );
                         },
-                        child: ProductCard(product: product),
                       );
-                    },
-                  ),
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
           Positioned(
-            bottom: 20, // hoặc lớn hơn chiều cao của BottomNavigationBar
+            bottom: 20,
             left: 0,
             right: 0,
             child: Center(

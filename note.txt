@@ -1,0 +1,2 @@
+khởi tạo fire-base:
+(cli) flutterfire configure --platforms=android,ios

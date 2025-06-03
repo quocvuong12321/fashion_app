@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "fashionshop_app",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart", // Sửa thành lib/main.dart
+            "console": "debugConsole"
+        },
+        {
+            "name": "fashionshop_app (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart", // Thêm program để đảm bảo
+            "flutterMode": "profile"
+        },
+        {
+            "name": "fashionshop_app (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart", // Thêm program để đảm bảo
+            "flutterMode": "release"
+        }
+    ]
+}

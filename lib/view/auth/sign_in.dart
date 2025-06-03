@@ -1,5 +1,4 @@
 import 'package:fashionshop_app/main.dart';
-import 'package:fashionshop_app/view/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'sign_up.dart';
@@ -31,7 +30,10 @@ class _SignInScreenState extends State<SignInScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.pushReplacementNamed(context, '/main_screen');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
     } else {
       setState(() {
         _errorMessage = requestSignIn.errorMessage;

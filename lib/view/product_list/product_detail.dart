@@ -1,6 +1,8 @@
 import 'package:fashionshop_app/RequestAPI/auth_guard.dart';
+import 'package:fashionshop_app/main.dart';
 import 'package:fashionshop_app/model/Product_Detail.dart';
 import 'package:fashionshop_app/model/Product_In_pay.dart';
+import 'package:fashionshop_app/model/Product.dart';
 import 'package:fashionshop_app/view/cart_screen.dart';
 import 'package:fashionshop_app/view/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,8 @@ import 'package:fashionshop_app/view/product_list/product_image.dart';
 import 'package:collection/collection.dart';
 import 'product_rating.dart';
 import 'package:provider/provider.dart';
-import '../../providers/cart_provider.dart'; // Đảm bảo import đúng
+import '../../providers/cart_provider.dart';
+import '../../RequestAPI/Request_Product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productSpuId;
@@ -27,7 +30,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool isLoading = true;
   int _currentImageIndex = 0;
   int cartItemCount = 0;
-  bool showFullDescription = false; // Biến trạng thái cho mô tả
+  bool showFullDescription = false;
+  List<Product> relatedProducts = []; // Sửa lại kiểu dữ liệu
 
   @override
   void initState() {
@@ -59,7 +63,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         productDetail = result;
         isLoading = false;
       });
+
+      // Sau khi lấy được thông tin sản phẩm, lấy thêm sản phẩm cùng loại
+      if (result != null && result.spu.categoryId != null) {
+        final related = await Request_Products.fetchRelatedProducts(
+          result.spu.categoryId!,
+          widget.productSpuId,
+        );
+        setState(() {
+          relatedProducts = related;
+        });
+      }
     } catch (e) {
+      print("Error fetching product: $e");
       setState(() {
         isLoading = false;
       });
@@ -581,6 +597,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
+                    MaterialPageRoute(
+                      builder: (context) => AuthGuard(child: CartScreen()),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
                     MaterialPageRoute(builder: (context) => Cart_Screen()),
                   );
                 },
@@ -774,18 +801,90 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               "Thông tin chi tiết",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            Divider(),
-            Html(data: product.description),
-            Divider(),
             ...descriptionAttrs.map(
               (e) => ListTile(title: Text(e.name), subtitle: Text(e.value)),
             ),
             Divider(),
             // Đánh giá
-            ProductRating(
-              productSpuId: widget.productSpuId,
-              // initialRatings: productDetail,
-            ),
+            ProductRating(productSpuId: widget.productSpuId),
+            Divider(),
+            // Sản phẩm cùng loại
+            if (relatedProducts.isNotEmpty) ...[
+              Text(
+                "Sản phẩm cùng loại",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              SizedBox(
+                height: 280,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: relatedProducts.length,
+                  itemBuilder: (context, index) {
+                    final product = relatedProducts[index];
+                    return Container(
+                      width: 160,
+                      margin: EdgeInsets.only(right: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Ảnh KHÔNG có GestureDetector
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: ProductImage(
+                              imagePath: product.image,
+                              width: 160,
+                              height: 160,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          // Bọc GestureDetector cho phần tên và giá
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ProductDetailScreen(
+                                        productSpuId: product.productSpuId,
+                                      ),
+                                ),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  NumberFormat.currency(
+                                    locale: 'vi_VN',
+                                    symbol: 'đ',
+                                  ).format(product.price),
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ),
